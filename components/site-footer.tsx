@@ -10,7 +10,7 @@ export default function SiteFooter() {
             <p className="display text-[2.2rem] leading-none md:text-[3rem]">
               Six perspectives.
               <br />
-              <span className="italic">One clear direction.</span>
+              <span className="editorial">One clear direction.</span>
             </p>
             <p className="mt-6 max-w-md text-muted">
               {site.shortDescription}

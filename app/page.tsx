@@ -19,7 +19,7 @@ export default function HomePage() {
                 <h1 className="display text-[3.4rem] leading-[0.9] sm:text-[4.8rem] md:text-[6.4rem] lg:text-[7.6rem]">
                   Six perspectives.
                   <br />
-                  <span className="italic text-accent">One clear direction.</span>
+                  <span className="editorial text-accent">One clear direction.</span>
                 </h1>
               </Reveal>
             </div>

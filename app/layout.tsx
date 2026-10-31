@@ -5,11 +5,11 @@ import { site, siteUrl } from "@/lib/site";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 
-const display = Instrument_Serif({
+const editorial = Instrument_Serif({
   subsets: ["latin"],
   weight: ["400"],
   style: ["normal", "italic"],
-  variable: "--font-display",
+  variable: "--font-editorial",
   display: "swap",
 });
 
@@ -55,7 +55,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${editorial.variable} ${sans.variable} ${mono.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
