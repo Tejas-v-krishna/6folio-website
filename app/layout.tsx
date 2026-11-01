@@ -1,30 +1,15 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter_Tight, IBM_Plex_Mono } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { site, siteUrl } from "@/lib/site";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import ScrollProgress from "@/components/scroll-progress";
 
-const editorial = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-editorial",
-  display: "swap",
-});
-
 const sans = Inter_Tight({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -56,7 +41,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${editorial.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={sans.variable}>
       <body className="relative">
         <div className="grid-overlay" aria-hidden="true" />
         <ScrollProgress />

@@ -19,7 +19,7 @@ Routes:
 ## Design direction
 
 - Warm paper background, near-black ink, electric blue signal colour, with orange, mint, and dark project surfaces.
-- Inter Tight for display and body, IBM Plex Mono for labels and metadata, Instrument Serif as a restrained editorial accent.
+- Inter Tight is the only typeface across the site, including headings, labels, navigation, buttons, forms, and project artwork.
 - Oversized `6FOLIO™` wordmark at the top of every page and in the blue footer.
 - Thin six-column grid overlay, editorial rules, section numbering, and asymmetric project layouts.
 - Original SVG project artwork rather than stock photography.
