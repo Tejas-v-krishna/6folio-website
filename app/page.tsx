@@ -7,6 +7,7 @@ import Accordion from "@/components/accordion";
 import StudioCard from "@/components/studio-card";
 import HorizontalWork from "@/components/horizontal-work";
 import Magnetic from "@/components/magnetic";
+import HeroMark3D from "@/components/hero-mark-3d";
 import { services, questions, studioFacts } from "@/lib/content";
 
 const manifestoItems = services.map((service) => ({
@@ -38,6 +39,12 @@ export default function HomePage() {
                 ™
               </sup>
             </span>
+          </div>
+
+          <div className="relative z-10 flex flex-1 items-center justify-center py-4 md:py-0">
+            <div className="h-[26vh] w-full max-w-[420px] md:h-[38vh] md:max-w-[560px]">
+              <HeroMark3D />
+            </div>
           </div>
 
           <div className="relative z-20 flex flex-col gap-7 md:flex-row md:items-end md:justify-between">

@@ -7,6 +7,7 @@ import SiteFooter from "@/components/site-footer";
 import ScrollProgress from "@/components/scroll-progress";
 import SmoothScroll from "@/components/smooth-scroll";
 import PageTransition from "@/components/page-transition";
+import Cursor from "@/components/cursor";
 
 const sans = Inter_Tight({
   subsets: ["latin"],
@@ -48,6 +49,7 @@ export default function RootLayout({
         <div className="grid-overlay" aria-hidden="true" />
         <ScrollProgress />
         <SmoothScroll />
+        <Cursor />
         <div className="relative z-10">
           <SiteHeader />
           <div className="h-[4.75rem] md:h-[5.5rem]" aria-hidden="true" />

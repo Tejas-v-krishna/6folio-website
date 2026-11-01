@@ -6,7 +6,6 @@ import { gsap, useGSAP } from "@/components/gsap";
 type ScrollRevealProps = {
   children: React.ReactNode;
   className?: string;
-  as?: React.ElementType;
   y?: number;
   delay?: number;
   stagger?: number;
@@ -16,13 +15,12 @@ type ScrollRevealProps = {
 export default function ScrollReveal({
   children,
   className = "",
-  as: Tag = "div",
   y = 34,
   delay = 0,
   stagger = 0,
   start = "top 88%",
 }: ScrollRevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useGSAP(
     () => {
@@ -54,8 +52,8 @@ export default function ScrollReveal({
   );
 
   return (
-    <Tag ref={ref as never} className={className}>
+    <div ref={ref} className={className}>
       {children}
-    </Tag>
+    </div>
   );
 }
