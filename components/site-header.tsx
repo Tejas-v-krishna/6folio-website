@@ -19,12 +19,7 @@ export default function SiteHeader() {
   const headerRef = useRef<HTMLElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const menuTl = useRef<gsap.core.Timeline | null>(null);
-  const iconTl = useRef<gsap.core.Timeline | null>(null);
   const settleTimer = useRef<number | null>(null);
-  const closing = useRef(false);
-  const lineTop = useRef<HTMLSpanElement | null>(null);
-  const lineMid = useRef<HTMLSpanElement | null>(null);
-  const lineBottom = useRef<HTMLSpanElement | null>(null);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
@@ -88,24 +83,9 @@ export default function SiteHeader() {
       tl.progress(0);
       menuTl.current = tl;
 
-      const top = lineTop.current;
-      const mid = lineMid.current;
-      const bottom = lineBottom.current;
-
-      if (top && mid && bottom) {
-        const icon = gsap.timeline({ paused: true });
-        icon
-          .to(top, { y: 7, rotate: 45, duration: 0.25, ease: "power2.inOut" }, 0)
-          .to(mid, { opacity: 0, duration: 0.15, ease: "power2.out" }, 0)
-          .to(bottom, { y: -7, rotate: -45, duration: 0.25, ease: "power2.inOut" }, 0);
-        iconTl.current = icon;
-      }
-
       return () => {
         tl.kill();
-        iconTl.current?.kill();
         menuTl.current = null;
-        iconTl.current = null;
       };
     },
     { scope: headerRef }
@@ -119,67 +99,31 @@ export default function SiteHeader() {
   }, []);
 
   const openMenu = useCallback(() => {
-    closing.current = false;
     clearSettleTimer();
     const tl = menuTl.current;
-    const icon = iconTl.current;
-    tl?.eventCallback("onReverseComplete", null);
     setOpen(true);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tl?.progress(1);
-      icon?.progress(1);
       return;
     }
     tl?.play();
-    icon?.play();
     settleTimer.current = window.setTimeout(() => {
       if (tl && tl.progress() < 1) tl.progress(1);
-      if (icon && icon.progress() < 1) icon.progress(1);
-    }, 900);
+    }, 600);
   }, [clearSettleTimer]);
 
   const closeMenu = useCallback(() => {
-    const tl = menuTl.current;
-    const icon = iconTl.current;
-
-    if (closing.current) return;
-    if (!tl) {
-      setOpen(false);
-      return;
-    }
-    if (tl.progress() === 0) {
-      setOpen(false);
-      return;
-    }
-
-    closing.current = true;
     clearSettleTimer();
-
-    const finish = () => {
-      if (settleTimer.current !== null) {
-        window.clearTimeout(settleTimer.current);
-        settleTimer.current = null;
-      }
-      closing.current = false;
-      setOpen(false);
-    };
-
+    const tl = menuTl.current;
+    setOpen(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      tl.progress(0);
-      icon?.progress(0);
-      finish();
+      tl?.progress(0);
       return;
     }
-
-    tl.eventCallback("onReverseComplete", finish);
-    tl.reverse();
-    icon?.reverse();
-
+    tl?.reverse();
     settleTimer.current = window.setTimeout(() => {
-      if (tl.progress() > 0) tl.progress(0);
-      if (icon && icon.progress() > 0) icon.progress(0);
-      finish();
-    }, 900);
+      if (tl && tl.progress() > 0) tl.progress(0);
+    }, 600);
   }, [clearSettleTimer]);
 
   useEffect(() => {
@@ -202,7 +146,7 @@ export default function SiteHeader() {
       {open && (
         <button
           type="button"
-          className="fixed inset-0 z-40 cursor-default bg-ink/45 backdrop-blur-sm"
+          className="fixed inset-0 z-40 cursor-default"
           onClick={closeMenu}
           aria-label="Close navigation"
         />
@@ -228,9 +172,24 @@ export default function SiteHeader() {
               onClick={() => (open ? closeMenu() : openMenu())}
             >
               <span className="relative block h-4 w-5" aria-hidden="true">
-                <span ref={lineTop} className="absolute left-0 top-0 h-[2px] w-5 bg-[#f2f0e9]" />
-                <span ref={lineMid} className="absolute left-0 top-[7px] h-[2px] w-5 bg-[#f2f0e9]" />
-                <span ref={lineBottom} className="absolute left-0 top-[14px] h-[2px] w-5 bg-[#f2f0e9]" />
+                <span
+                  className="absolute left-0 h-[2px] w-5 bg-[#f2f0e9]"
+                  style={{
+                    top: open ? 7 : 0,
+                    transform: open ? "rotate(45deg)" : "none",
+                  }}
+                />
+                <span
+                  className="absolute left-0 top-[7px] h-[2px] w-5 bg-[#f2f0e9]"
+                  style={{ opacity: open ? 0 : 1 }}
+                />
+                <span
+                  className="absolute left-0 h-[2px] w-5 bg-[#f2f0e9]"
+                  style={{
+                    top: open ? 7 : 14,
+                    transform: open ? "rotate(-45deg)" : "none",
+                  }}
+                />
               </span>
             </button>
           </div>
