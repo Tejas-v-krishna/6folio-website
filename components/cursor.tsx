@@ -56,7 +56,7 @@ export default function Cursor() {
   return (
     <div
       ref={ref}
-      className="pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink mix-blend-difference"
+      className="pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white mix-blend-difference"
       aria-hidden="true"
     />
   );
