@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Reveal from "@/components/reveal";
+import SplitReveal from "@/components/split-reveal";
+import ScrollReveal from "@/components/scroll-reveal";
+import Manifesto from "@/components/manifesto";
 import { method, engagements, firstNinetyDays } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 
@@ -11,142 +13,161 @@ export const metadata: Metadata = {
   alternates: { canonical: `${siteUrl()}/approach` },
 };
 
+const methodItems = method.map((stage) => ({
+  index: stage.index,
+  label: "Growth loop",
+  title: stage.name,
+  short: stage.headline,
+  description: stage.description,
+}));
+
 export default function ApproachPage() {
   return (
     <main>
       <section className="border-b border-rule">
-        <div className="shell pt-16 pb-14 md:pt-24 md:pb-20">
-          <Reveal>
-            <p className="label mb-4">How we work</p>
-            <h1 className="display text-4xl md:text-6xl max-w-3xl">
-              Six perspectives, moving in one direction.
-            </h1>
-            <p className="mt-6 max-w-2xl text-muted">
-              A strong result starts before the first design or campaign goes live. We use a shared process to keep the business goal, creative decisions, and delivery connected.
-            </p>
-          </Reveal>
+        <div className="shell pb-12 pt-10 md:pb-16 md:pt-16">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="mono">How we work / 01</p>
+            <p className="mono">The 6FOLIO Growth Loop</p>
+          </div>
+          <SplitReveal
+            as="h1"
+            text="Six perspectives, moving in one direction."
+            className="type-hero mt-8 max-w-6xl text-balance"
+            type="lines"
+            scroll={false}
+          />
+          <p className="type-body-lg mt-8 max-w-2xl text-muted">
+            A strong result starts before the first design or campaign goes live. We use
+            a shared process to keep the business goal, creative decisions, and delivery
+            connected.
+          </p>
         </div>
       </section>
 
       <section className="border-b border-rule">
         <div className="shell py-12 md:py-16">
-          <Reveal>
-            <p className="label mb-4">The 6FOLIO Growth Loop</p>
-            <h2 className="display text-3xl md:text-4xl max-w-3xl">
-              Understand to Optimise.
-            </h2>
-            <p className="mt-5 max-w-2xl text-muted">
-              Every project begins with a business problem and ends with a review of what changed. A beautiful campaign is not automatically a successful campaign. The work is judged against the goal agreed with the client.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      <section>
-        <div className="shell py-12 md:py-16">
-          <ol className="border-t border-rule">
-            {method.map((stage) => (
-              <li key={stage.name} className="border-b border-rule">
-                <div className="grid gap-8 py-12 md:grid-cols-12 md:py-16">
-                  <div className="md:col-span-3">
-                    <Reveal>
-                      <span className="display text-6xl text-muted">{stage.index}</span>
-                      <p className="label mt-3">{stage.name}</p>
-                    </Reveal>
-                  </div>
-                  <div className="md:col-span-9">
-                    <Reveal delay={80}>
-                      <h2 className="display text-3xl md:text-4xl">{stage.headline}</h2>
-                      <p className="mt-5 text-muted max-w-3xl">{stage.description}</p>
-                      <div className="mt-6 grid gap-2 md:grid-cols-2">
-                        <div>
-                          <p className="label">Output</p>
-                          <p className="mt-1 text-sm text-ink-soft">{stage.output}</p>
-                        </div>
-                      </div>
-                    </Reveal>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-8 text-sm text-muted">
-            Not every project needs all six stages or all six disciplines. We shape the team and process around the brief.
-          </p>
-        </div>
-      </section>
-
-      <section className="border-t border-rule bg-paper-2">
-        <div className="shell py-16 md:py-20">
-          <Reveal>
-            <p className="label mb-4">Engagement formats</p>
-            <h2 className="display text-3xl md:text-4xl max-w-3xl">
-              Two simple ways to work together.
-            </h2>
-          </Reveal>
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {engagements.map((engagement, index) => (
-              <Reveal key={engagement.title} delay={index * 80}>
-                <div className="border border-rule bg-paper p-6 md:p-8">
-                  <h3 className="display text-2xl">{engagement.title}</h3>
-                  <p className="mt-4 text-muted">{engagement.description}</p>
-                </div>
-              </Reveal>
-            ))}
+          <div className="grid gap-8 md:grid-cols-12">
+            <div className="md:col-span-3">
+              <p className="mono">The principle / 02</p>
+            </div>
+            <div className="md:col-span-9">
+              <ScrollReveal>
+                <p className="type-h2 max-w-4xl">
+                  Every project begins with a business problem and ends with a review of
+                  what changed.
+                </p>
+                <p className="type-body-lg mt-6 max-w-2xl text-muted">
+                  A beautiful campaign is not automatically a successful campaign. The
+                  work is judged against the goal agreed with the client.
+                </p>
+              </ScrollReveal>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-rule">
-        <div className="shell py-16 md:py-20">
-          <Reveal>
-            <p className="label mb-4">Example first 90 days</p>
-            <h2 className="display text-3xl md:text-4xl max-w-3xl">
-              A planning model, not a promise.
-            </h2>
-            <p className="mt-5 max-w-2xl text-muted">
-              This is an example planning model, not a promise that every project can be completed in 90 days.
-            </p>
-          </Reveal>
-          <div className="mt-10 overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-rule">
-                  <th className="label py-3 pr-6">Period</th>
-                  <th className="label py-3 pr-6">Focus</th>
-                  <th className="label py-3">Typical activities</th>
-                </tr>
-              </thead>
-              <tbody>
-                {firstNinetyDays.map((row) => (
-                  <tr key={row.period} className="border-b border-rule align-top">
-                    <td className="py-4 pr-6 text-sm font-medium text-ink">{row.period}</td>
-                    <td className="py-4 pr-6 text-sm text-ink-soft">{row.focus}</td>
-                    <td className="py-4 text-sm text-muted">{row.activities}</td>
-                  </tr>
+      <Manifesto
+        items={methodItems}
+        eyebrow="The growth loop / 03"
+        note="Understand, position, create, distribute, convert, optimise."
+      />
+
+      <section className="border-b border-rule">
+        <div className="shell py-16 md:py-24">
+          <div className="grid gap-8 md:grid-cols-12">
+            <div className="md:col-span-3">
+              <p className="mono">Engagement formats / 04</p>
+            </div>
+            <div className="md:col-span-9">
+              <SplitReveal
+                as="h2"
+                text="Two simple ways to work together."
+                className="type-h2 max-w-3xl"
+              />
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {engagements.map((engagement, index) => (
+                  <ScrollReveal key={engagement.title} delay={index * 0.08}>
+                    <div
+                      className={`h-full border border-rule p-6 md:p-8 ${
+                        index === 0 ? "bg-paper-2" : "bg-ink text-paper"
+                      }`}
+                    >
+                      <p className={`mono ${index === 0 ? "" : "text-paper/50"}`}>
+                        0{index + 1}
+                      </p>
+                      <h3 className="type-h3 mt-4">{engagement.title}</h3>
+                      <p
+                        className={`mt-4 text-sm leading-relaxed ${
+                          index === 0 ? "text-muted" : "text-paper/65"
+                        }`}
+                      >
+                        {engagement.description}
+                      </p>
+                    </div>
+                  </ScrollReveal>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-rule bg-ink text-paper">
-        <div className="shell py-16 md:py-20">
-          <Reveal>
-            <h2 className="display text-3xl md:text-4xl text-paper max-w-3xl">
-              Have a challenge of your own?
-            </h2>
-            <p className="mt-5 max-w-xl text-paper/70">
-              Tell us what is not working or what you are trying to build. We can help identify the right scope before recommending a solution.
-            </p>
-            <Link
-              href="/contact"
-              className="btn bg-paper text-ink border-paper hover:bg-accent hover:text-paper hover:border-accent mt-8"
-            >
+      <section className="border-b border-rule">
+        <div className="shell py-16 md:py-24">
+          <div className="grid gap-8 md:grid-cols-12">
+            <div className="md:col-span-3">
+              <p className="mono">Example first 90 days / 05</p>
+            </div>
+            <div className="md:col-span-9">
+              <h2 className="type-h2 max-w-3xl">A planning model, not a promise.</h2>
+              <p className="mt-5 max-w-xl text-muted">
+                This is an example planning model, not a promise that every project can
+                be completed in 90 days.
+              </p>
+
+              <div className="mt-10 overflow-x-auto">
+                <table className="w-full min-w-[680px] text-left">
+                  <thead>
+                    <tr className="border-y border-rule">
+                      <th className="mono py-3 pr-6 font-normal">Period</th>
+                      <th className="mono py-3 pr-6 font-normal">Focus</th>
+                      <th className="mono py-3 font-normal">Typical activities</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {firstNinetyDays.map((row) => (
+                      <tr key={row.period} className="border-b border-rule align-top">
+                        <td className="py-4 pr-6 text-sm font-medium">{row.period}</td>
+                        <td className="py-4 pr-6 text-sm text-ink-soft">{row.focus}</td>
+                        <td className="py-4 text-sm leading-relaxed text-muted">
+                          {row.activities}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-ink text-paper">
+        <div className="shell py-16 md:py-24">
+          <SplitReveal
+            as="h2"
+            text="Have a challenge of your own?"
+            className="type-h2 max-w-3xl text-paper"
+          />
+          <div className="mt-8 flex flex-wrap items-center gap-6">
+            <Link href="/contact" className="btn btn-light">
               Start a conversation
             </Link>
-          </Reveal>
+            <p className="mono text-paper/50">
+              No prepared pitch needed. A clear first conversation is enough.
+            </p>
+          </div>
         </div>
       </section>
     </main>

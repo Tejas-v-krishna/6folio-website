@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import ProjectCard from "@/components/project-card";
-import Reveal from "@/components/reveal";
+import SplitReveal from "@/components/split-reveal";
+import ScrollReveal from "@/components/scroll-reveal";
 import { projects } from "@/lib/content";
 
 const filters = ["All", "Brand", "Content", "Production", "Social", "Growth", "Digital"];
@@ -28,22 +29,34 @@ export default function WorkIndex() {
   return (
     <main>
       <section className="border-b border-rule">
-        <div className="shell pt-16 pb-14 md:pt-24 md:pb-20">
-          <Reveal>
-            <p className="label mb-4">Selected work and studies</p>
-            <h1 className="display text-4xl md:text-6xl max-w-3xl">
-              The thinking behind the finished thing.
-            </h1>
-            <p className="mt-6 max-w-2xl text-muted">
-              A collection of projects, experiments, and self-initiated studies. Look beyond the final image and into the choices that shaped the work.
+        <div className="shell pb-10 pt-10 md:pb-14 md:pt-16">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="mono">Selected work and studies / 01</p>
+            <p className="mono">03 projects</p>
+          </div>
+          <SplitReveal
+            as="h1"
+            text="The thinking behind the finished thing."
+            className="type-hero mt-8 max-w-6xl text-balance"
+            type="lines"
+            scroll={false}
+          />
+          <div className="mt-8 grid gap-6 md:grid-cols-12">
+            <p className="type-body-lg max-w-2xl text-muted md:col-span-8">
+              A collection of projects, experiments, and self-initiated studies. Look
+              beyond the final image and into the choices that shaped the work.
             </p>
-          </Reveal>
+            <p className="mono md:col-span-4 md:text-right">
+              Every project is labelled by type. Concept work is never presented as a
+              client engagement.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section>
-        <div className="shell py-12 md:py-16">
-          <div className="flex flex-wrap gap-3" role="group" aria-label="Filter work by service">
+      <section className="border-b border-rule">
+        <div className="shell py-10 md:py-14">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter work by service">
             {filters.map((filter) => (
               <button
                 key={filter}
@@ -55,39 +68,54 @@ export default function WorkIndex() {
                 {filter}
               </button>
             ))}
+            <span className="mono ml-auto">
+              0{visible.length} / 03
+            </span>
           </div>
 
           {visible.length === 0 ? (
-            <p className="mt-16 text-muted">New work is taking shape. Check back soon.</p>
+            <p className="py-20 text-muted">New work is taking shape. Check back soon.</p>
           ) : (
-            <div className="mt-12 grid gap-10 md:grid-cols-12">
+            <div className="mt-10 grid gap-10 md:grid-cols-12 md:gap-8">
               {visible.map((project, index) => (
                 <div
                   key={project.slug}
                   className={
                     index === 0
-                      ? "md:col-span-7"
+                      ? "md:col-span-6"
                       : index === 1
-                        ? "md:col-span-5 md:mt-16"
-                        : "md:col-span-8 md:col-start-3"
+                        ? "md:col-span-6 md:mt-16"
+                        : "md:col-span-12 md:mt-4"
                   }
                 >
-                  <Reveal delay={index * 80}>
-                    <ProjectCard project={project} />
-                  </Reveal>
+                  <ScrollReveal delay={index * 0.06}>
+                    <ProjectCard
+                      project={project}
+                      index={index}
+                      aspect={
+                        index === 2
+                          ? "aspect-[16/10] md:aspect-[2.15/1]"
+                          : "aspect-[4/5]"
+                      }
+                    />
+                  </ScrollReveal>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="mt-16 border-t border-rule pt-12">
-            <p className="label mb-3">Have a challenge of your own?</p>
-            <h2 className="display text-3xl md:text-4xl">
-              Let us look at it from six angles.
-            </h2>
-            <Link href="/contact" className="btn btn-secondary mt-6">
-              Start a conversation
-            </Link>
+          <div className="mt-16 border-t border-rule pt-10">
+            <div className="grid gap-6 md:grid-cols-12 md:items-end">
+              <div className="md:col-span-8">
+                <p className="mono mb-3">Have a challenge of your own?</p>
+                <h2 className="type-h2">Let us look at it from six angles.</h2>
+              </div>
+              <div className="md:col-span-4 md:justify-self-end">
+                <Link href="/contact" className="btn btn-primary">
+                  Start a conversation
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

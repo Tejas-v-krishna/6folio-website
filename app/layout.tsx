@@ -4,6 +4,7 @@ import "./globals.css";
 import { site, siteUrl } from "@/lib/site";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
+import ScrollProgress from "@/components/scroll-progress";
 
 const editorial = Instrument_Serif({
   subsets: ["latin"],
@@ -15,7 +16,7 @@ const editorial = Instrument_Serif({
 
 const sans = Inter_Tight({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -56,18 +57,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${editorial.variable} ${sans.variable} ${mono.variable}`}>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "document.documentElement.classList.add('js');",
-          }}
-        />
-      </head>
-      <body>
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+      <body className="relative">
+        <div className="grid-overlay" aria-hidden="true" />
+        <ScrollProgress />
+        <div className="relative z-10">
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </div>
         <div className="grain" aria-hidden="true" />
       </body>
     </html>

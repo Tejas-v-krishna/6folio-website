@@ -1,22 +1,28 @@
 import Link from "next/link";
-import Reveal from "@/components/reveal";
+import SplitReveal from "@/components/split-reveal";
 
 export default function NotFound() {
   return (
-    <main className="min-h-[70vh] flex items-center">
+    <main className="flex min-h-[70vh] items-center">
       <div className="shell py-20 md:py-28">
-        <Reveal>
-          <p className="label mb-4">404</p>
-          <h1 className="display text-4xl md:text-6xl max-w-3xl">
-            This page took a different turn.
-          </h1>
-          <p className="mt-6 max-w-xl text-muted">
-            The page you are looking for may have moved, or the address may be incorrect.
-          </p>
-          <Link href="/" className="btn btn-secondary mt-8">
+        <p className="mono">404 / Wrong turn</p>
+        <SplitReveal
+          as="h1"
+          text="This page took a different turn."
+          className="type-hero mt-6 max-w-4xl"
+          type="lines"
+        />
+        <p className="mt-6 max-w-xl text-muted">
+          The page you are looking for may have moved, or the address may be incorrect.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/" className="btn btn-primary">
             Back to the homepage
           </Link>
-        </Reveal>
+          <Link href="/work" className="btn btn-secondary">
+            View the work
+          </Link>
+        </div>
       </div>
     </main>
   );

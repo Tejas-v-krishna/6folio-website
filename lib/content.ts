@@ -323,8 +323,10 @@ export type Project = {
   services: string[];
   label: string;
   year: string;
+  principle: string;
   description: string;
   artwork: "serein" | "goodkind" | "northstar";
+  surface: "orange" | "mint" | "ink";
   brief: string;
   opportunity: string;
   direction: string;
@@ -344,9 +346,11 @@ export const projects: Project[] = [
     services: ["Brand direction", "Content and storytelling", "Photography and film", "Web and digital experience"],
     label: "Independent concept project",
     year: "2026",
+    principle: "Objects before interface.",
     description:
       "A visual and digital identity for a homeware concept built around useful objects, honest materials, and quieter design.",
     artwork: "serein",
+    surface: "orange",
     brief:
       "Serein Objects is a fictional homeware label created for this study. The brief was to build a brand and e-commerce experience for a small collection of everyday objects made from honest materials, without the visual noise that usually surrounds direct-to-consumer homeware.",
     opportunity:
@@ -389,9 +393,11 @@ export const projects: Project[] = [
     services: ["Content and storytelling", "Photography and film", "Social and community", "Marketing and growth"],
     label: "Independent concept project",
     year: "2026",
+    principle: "The useful pause.",
     description:
       "A campaign concept that follows the people, places, and small rituals behind a neighbourhood coffee brand.",
     artwork: "goodkind",
+    surface: "mint",
     brief:
       "Goodkind Coffee is a fictional neighbourhood coffee brand created for this study. The brief was to introduce the place through the ritual around the cup rather than the usual language of origin, roast, and equipment. The audience already drinks coffee. The question is why they should choose this room, this counter, and these people.",
     opportunity:
@@ -434,9 +440,11 @@ export const projects: Project[] = [
     services: ["Brand direction", "Content and storytelling", "Marketing and growth", "Web and digital experience"],
     label: "Independent concept project",
     year: "2026",
+    principle: "One workflow at a time.",
     description:
       "A launch experience for a fictional software product, built to make its value easier to grasp and its next step easier to take.",
     artwork: "northstar",
+    surface: "ink",
     brief:
       "Northstar Work is a fictional work-management product created for this study. The product had a broad feature set and a familiar problem: buyers could not tell what it was for. The brief was to create a launch experience that explains one clear use case at a time and gives a prospective team an obvious next step.",
     opportunity:
@@ -480,3 +488,64 @@ export function getNextProject(slug: string): Project {
   const index = projects.findIndex((project) => project.slug === slug);
   return projects[(index + 1) % projects.length];
 }
+
+export const studioFacts = [
+  {
+    title: "Six disciplines, one brief",
+    description:
+      "Strategy, content, image, motion, growth, and digital experience work from the same objective, audience, and measurement plan.",
+  },
+  {
+    title: "One named point of contact",
+    description:
+      "Every project has a clear route through the work, from the first conversation to the final handover.",
+  },
+  {
+    title: "Concept-led portfolio",
+    description:
+      "The first release shows self-initiated studies, labelled honestly. Real client work will be added only when it can be published.",
+  },
+  {
+    title: "Partner-supported specialists",
+    description:
+      "Dedicated brand design leadership, specialist search, and community management at scale can be supported by trusted partners.",
+  },
+  {
+    title: "Measurement before launch",
+    description:
+      "Success is agreed before campaigns begin. We separate evidence from expectation and report both clearly.",
+  },
+];
+
+export const questions = [
+  {
+    id: "change",
+    question: "What needs to change?",
+    answer:
+      "We start with the business problem, not the deliverable list. The first conversation is about the outcome you need, the audience it affects, and what has already been tried.",
+  },
+  {
+    id: "audience",
+    question: "Who needs to care?",
+    answer:
+      "A clear brand is not for everyone. We define the people the work needs to reach and the action it should make easier, then decide which channels deserve attention.",
+  },
+  {
+    id: "measure",
+    question: "What will we measure?",
+    answer:
+      "We agree on signs of progress before production starts. For concept work, we state intended measures rather than claimed results. For live work, we report against the agreed objective.",
+  },
+  {
+    id: "leave-out",
+    question: "What can we leave out?",
+    answer:
+      "Scope discipline is part of the work. We would rather make fewer things properly than fill a proposal with outputs that do not serve the objective.",
+  },
+  {
+    id: "connected",
+    question: "How do six people stay connected?",
+    answer:
+      "One shared brief, one named point of contact, and a process that keeps specialists close to the decisions. The work is reviewed as a whole, not handed between silos.",
+  },
+];

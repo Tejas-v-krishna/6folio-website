@@ -56,10 +56,14 @@ export default function ContactForm() {
 
     const nextErrors: Record<string, string> = {};
     if (!name) nextErrors.name = "Please provide your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = "Please provide a valid work email.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextErrors.email = "Please provide a valid work email.";
+    }
     if (!company) nextErrors.company = "Please provide your company or brand.";
     if (needs.length === 0) nextErrors.needs = "Please select at least one area you need help with.";
-    if (description.length < 10) nextErrors.description = "Please tell us a little about the project.";
+    if (description.length < 10) {
+      nextErrors.description = "Please tell us a little about the project.";
+    }
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -82,7 +86,11 @@ export default function ContactForm() {
           website,
         }),
       });
-      const result = (await response.json()) as { ok?: boolean; message?: string; configured?: boolean };
+      const result = (await response.json()) as {
+        ok?: boolean;
+        message?: string;
+        configured?: boolean;
+      };
 
       if (response.ok && result.ok) {
         setStatus("success");
@@ -104,10 +112,10 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-8">
+    <form onSubmit={handleSubmit} noValidate className="space-y-10">
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <label className="label block mb-2" htmlFor="name">
+          <label className="field-label" htmlFor="name">
             Name
           </label>
           <input
@@ -120,13 +128,13 @@ export default function ContactForm() {
             aria-describedby={errors.name ? "name-error" : undefined}
           />
           {errors.name && (
-            <p id="name-error" className="mt-2 text-sm text-accent">
+            <p id="name-error" className="mt-2 text-sm text-error">
               {errors.name}
             </p>
           )}
         </div>
         <div>
-          <label className="label block mb-2" htmlFor="email">
+          <label className="field-label" htmlFor="email">
             Work email
           </label>
           <input
@@ -139,7 +147,7 @@ export default function ContactForm() {
             aria-describedby={errors.email ? "email-error" : undefined}
           />
           {errors.email && (
-            <p id="email-error" className="mt-2 text-sm text-accent">
+            <p id="email-error" className="mt-2 text-sm text-error">
               {errors.email}
             </p>
           )}
@@ -147,7 +155,7 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label className="label block mb-2" htmlFor="company">
+        <label className="field-label" htmlFor="company">
           Company or brand
         </label>
         <input
@@ -160,23 +168,27 @@ export default function ContactForm() {
           aria-describedby={errors.company ? "company-error" : undefined}
         />
         {errors.company && (
-          <p id="company-error" className="mt-2 text-sm text-accent">
+          <p id="company-error" className="mt-2 text-sm text-error">
             {errors.company}
           </p>
         )}
       </div>
 
-      <div>
-        <p className="label mb-3">What do you need help with?</p>
-        <div className="grid gap-3 sm:grid-cols-2">
+      <fieldset>
+        <legend className="field-label mb-3">What do you need help with?</legend>
+        <div className="grid gap-2 sm:grid-cols-2">
           {needsOptions.map((option) => (
             <label
               key={option}
-              className="flex items-center gap-3 border border-rule px-4 py-3 text-sm cursor-pointer hover:border-ink"
+              className={`flex cursor-pointer items-center gap-3 border px-4 py-3 text-sm transition-colors ${
+                needs.includes(option)
+                  ? "border-accent bg-accent-soft"
+                  : "border-rule hover:border-ink"
+              }`}
             >
               <input
                 type="checkbox"
-                className="h-4 w-4 accent-ink"
+                className="h-4 w-4 accent-[var(--color-accent)]"
                 checked={needs.includes(option)}
                 onChange={() => toggleNeed(option)}
               />
@@ -184,13 +196,11 @@ export default function ContactForm() {
             </label>
           ))}
         </div>
-        {errors.needs && (
-          <p className="mt-2 text-sm text-accent">{errors.needs}</p>
-        )}
-      </div>
+        {errors.needs && <p className="mt-2 text-sm text-error">{errors.needs}</p>}
+      </fieldset>
 
       <div>
-        <label className="label block mb-2" htmlFor="description">
+        <label className="field-label" htmlFor="description">
           Tell us a little about the project
         </label>
         <textarea
@@ -202,7 +212,7 @@ export default function ContactForm() {
           aria-describedby={errors.description ? "description-error" : undefined}
         />
         {errors.description && (
-          <p id="description-error" className="mt-2 text-sm text-accent">
+          <p id="description-error" className="mt-2 text-sm text-error">
             {errors.description}
           </p>
         )}
@@ -210,7 +220,7 @@ export default function ContactForm() {
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <label className="label block mb-2" htmlFor="budget">
+          <label className="field-label" htmlFor="budget">
             Approximate budget (optional)
           </label>
           <select id="budget" name="budget" className="field" defaultValue="">
@@ -223,7 +233,7 @@ export default function ContactForm() {
           </select>
         </div>
         <div>
-          <label className="label block mb-2" htmlFor="timeline">
+          <label className="field-label" htmlFor="timeline">
             Desired start date (optional)
           </label>
           <select id="timeline" name="timeline" className="field" defaultValue="">
@@ -237,34 +247,35 @@ export default function ContactForm() {
         </div>
       </div>
 
-      {/* Honeypot field, hidden from real users */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={status === "submitting"}
-        >
+      <div className="flex flex-col gap-4 border-t border-rule pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <button type="submit" className="btn btn-primary" disabled={status === "submitting"}>
           {status === "submitting" ? "Sending your enquiry..." : "Send project enquiry"}
         </button>
-        {status === "success" && (
-          <p className="text-sm text-ink" role="status">
-            {message}
-          </p>
-        )}
-        {status === "error" && (
-          <p className="text-sm text-accent" role="alert">
-            {message}
-          </p>
-        )}
+        <div aria-live="polite">
+          {status === "success" && (
+            <p className="text-sm text-success" role="status">
+              {message}
+            </p>
+          )}
+          {status === "error" && (
+            <p className="max-w-md text-sm text-error" role="alert">
+              {message}
+            </p>
+          )}
+          {status === "idle" && (
+            <p className="mono">We will use these details to respond to your enquiry.</p>
+          )}
+        </div>
       </div>
 
-      <p className="text-xs text-muted">
-        We will use these details to respond to your enquiry. Add a full privacy policy and data-handling explanation before collecting live submissions.
+      <p className="text-xs leading-relaxed text-muted">
+        We will use these details to respond to your enquiry. Add a full privacy policy
+        and data-handling explanation before collecting live submissions.
       </p>
     </form>
   );

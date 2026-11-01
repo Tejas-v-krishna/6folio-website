@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Reveal from "@/components/reveal";
+import SplitReveal from "@/components/split-reveal";
+import ScrollReveal from "@/components/scroll-reveal";
+import Parallax from "@/components/parallax";
 import ProjectArtwork from "@/components/project-artwork";
 import { getProject, getNextProject, projects } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
@@ -42,49 +44,50 @@ export default async function ProjectPage({
   return (
     <main>
       <section className="border-b border-rule">
-        <div className="shell pt-12 pb-10 md:pt-20 md:pb-16">
-          <Link href="/work" className="label link-underline">
+        <div className="shell pb-12 pt-8 md:pb-16 md:pt-12">
+          <Link href="/work" className="mono link-underline">
             Back to all work
           </Link>
-          <div className="mt-8 grid gap-8 md:grid-cols-12 md:items-end">
-            <div className="md:col-span-7">
-              <Reveal>
-                <p className="label mb-4">{project.label}</p>
-                <h1 className="display text-4xl md:text-6xl lg:text-7xl">
-                  {project.title}
-                </h1>
-                <p className="mt-6 text-lg text-ink-soft max-w-2xl">
-                  {project.description}
-                </p>
-              </Reveal>
+
+          <div className="mt-10 grid gap-10 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-8">
+              <p className="mono">
+                {project.label} / {project.year}
+              </p>
+              <SplitReveal
+                as="h1"
+                text={project.title}
+                className="type-hero mt-4"
+                type="lines"
+                scroll={false}
+              />
+              <p className="type-body-lg mt-6 max-w-2xl text-muted">
+                {project.description}
+              </p>
             </div>
-            <div className="md:col-span-5">
-              <Reveal delay={120}>
-                <dl className="border-t border-rule">
-                  {[
-                    ["Project type", project.type],
-                    ["Industry", project.industry],
-                    ["Year", project.year],
-                    ["Services", project.services.join(", ")],
-                  ].map(([term, value]) => (
-                    <div
-                      key={term}
-                      className="grid grid-cols-2 gap-4 border-b border-rule py-3"
-                    >
-                      <dt className="label">{term}</dt>
-                      <dd className="text-sm text-ink">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Reveal>
+
+            <div className="md:col-span-4">
+              <dl className="border-t border-rule">
+                {[
+                  ["Project type", project.type],
+                  ["Industry", project.industry],
+                  ["Services", project.services.join(", ")],
+                  ["Label", "Independent concept project by 6FOLIO"],
+                ].map(([term, value]) => (
+                  <div key={term} className="grid grid-cols-2 gap-4 border-b border-rule py-3">
+                    <dt className="mono">{term}</dt>
+                    <dd className="text-sm leading-relaxed">{value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-rule">
-        <div className="shell py-8 md:py-12">
-          <div className="aspect-[16/9] md:aspect-[21/9]">
+      <section className="overflow-hidden border-b border-rule">
+        <div className="h-[52vh] md:h-[72vh]">
+          <Parallax className="h-full" amount={7} scale={1.14}>
             <ProjectArtwork
               variant={project.artwork}
               scene={0}
@@ -92,143 +95,93 @@ export default async function ProjectPage({
               ariaLabel={`Cover artwork for ${project.title}`}
               className="h-full w-full"
             />
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <div className="grid gap-12 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <Reveal>
-                <p className="label mb-3">01. The brief</p>
-                <h2 className="display text-3xl md:text-4xl">What needed solving.</h2>
-              </Reveal>
-            </div>
-            <div className="md:col-span-8">
-              <Reveal delay={80}>
-                <p className="text-lg text-ink-soft">{project.brief}</p>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <div className="grid gap-12 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <Reveal>
-                <p className="label mb-3">02. The opportunity</p>
-                <h2 className="display text-3xl md:text-4xl">What we noticed.</h2>
-              </Reveal>
-            </div>
-            <div className="md:col-span-8">
-              <Reveal delay={80}>
-                <p className="text-lg text-ink-soft">{project.opportunity}</p>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <div className="grid gap-12 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <Reveal>
-                <p className="label mb-3">03. The direction</p>
-                <h2 className="display text-3xl md:text-4xl">The decisions behind the work.</h2>
-              </Reveal>
-            </div>
-            <div className="md:col-span-8">
-              <Reveal delay={80}>
-                <p className="text-lg text-ink-soft">{project.direction}</p>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule bg-paper-2">
-        <div className="shell py-16 md:py-24">
-          <Reveal>
-            <p className="label mb-3">04. The work</p>
-            <h2 className="display text-3xl md:text-4xl">Outputs of the concept.</h2>
-            <p className="mt-6 max-w-2xl text-muted">{project.work}</p>
-          </Reveal>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {project.gallery.map((item, index) => (
-              <Reveal key={item.caption} delay={index * 80}>
-                <div className="aspect-[4/3]">
-                  <ProjectArtwork
-                    variant={project.artwork}
-                    scene={item.scene}
-                    title={project.title}
-                    ariaLabel={item.caption}
-                    className="h-full w-full"
-                  />
-                </div>
-                <p className="mt-3 text-sm text-muted">{item.caption}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <Reveal>
-            <p className="label mb-3">05. The details</p>
-            <h2 className="display text-3xl md:text-4xl">Meaningful decisions.</h2>
-          </Reveal>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {project.details.map((detail, index) => (
-              <Reveal key={detail.title} delay={index * 80}>
-                <div className="border-t border-rule pt-6">
-                  <h3 className="display text-2xl">{detail.title}</h3>
-                  <p className="mt-4 text-muted">{detail.description}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <div className="grid gap-12 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <Reveal>
-                <p className="label mb-3">06. The outcome or intended measure</p>
-                <h2 className="display text-3xl md:text-4xl">How it would be judged.</h2>
-              </Reveal>
-            </div>
-            <div className="md:col-span-8">
-              <Reveal delay={80}>
-                <p className="text-lg text-ink-soft">{project.measure}</p>
-              </Reveal>
-            </div>
-          </div>
+          </Parallax>
         </div>
       </section>
 
       <section className="border-b border-rule bg-ink text-paper">
-        <div className="shell py-16 md:py-20">
-          <div className="grid gap-8 md:grid-cols-12 md:items-center">
-            <div className="md:col-span-7">
-              <p className="label text-paper/60 mb-3">07. The next project</p>
-              <h2 className="display text-3xl md:text-4xl text-paper">
-                Have a challenge of your own? Let us look at it from six angles.
-              </h2>
+        <div className="shell py-16 md:py-24">
+          <p className="mono text-paper/50">The central idea</p>
+          <SplitReveal
+            as="p"
+            text={project.principle}
+            className="type-hero mt-4 text-paper"
+            type="lines"
+          />
+        </div>
+      </section>
+
+      <section className="border-b border-rule">
+        <div className="shell space-y-16 py-16 md:space-y-24 md:py-24">
+          <SectionBlock number="01" title="The brief">
+            <p className="type-body-lg text-ink-soft">{project.brief}</p>
+          </SectionBlock>
+
+          <SectionBlock number="02" title="The opportunity">
+            <p className="type-body-lg text-ink-soft">{project.opportunity}</p>
+          </SectionBlock>
+
+          <SectionBlock number="03" title="The direction">
+            <p className="type-body-lg text-ink-soft">{project.direction}</p>
+          </SectionBlock>
+
+          <SectionBlock number="04" title="The work">
+            <p className="max-w-2xl text-muted">{project.work}</p>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {project.gallery.map((item, index) => (
+                <ScrollReveal key={item.caption} delay={index * 0.06}>
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <ProjectArtwork
+                      variant={project.artwork}
+                      scene={item.scene}
+                      title={project.title}
+                      ariaLabel={item.caption}
+                      className="h-full w-full"
+                    />
+                  </div>
+                  <p className="mono mt-3 leading-relaxed">{item.caption}</p>
+                </ScrollReveal>
+              ))}
             </div>
-            <div className="md:col-span-5 flex flex-wrap gap-3 md:justify-end">
-              <Link href="/contact" className="btn bg-paper text-ink border-paper hover:bg-accent hover:text-paper hover:border-accent">
+          </SectionBlock>
+
+          <SectionBlock number="05" title="The details">
+            <div className="grid gap-8 md:grid-cols-3">
+              {project.details.map((detail, index) => (
+                <ScrollReveal key={detail.title} delay={index * 0.06}>
+                  <div className="border-t border-rule pt-5">
+                    <h3 className="type-h4">{detail.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted">
+                      {detail.description}
+                    </p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </SectionBlock>
+
+          <SectionBlock number="06" title="The outcome or intended measure">
+            <p className="type-body-lg text-ink-soft">{project.measure}</p>
+          </SectionBlock>
+        </div>
+      </section>
+
+      <section className="bg-accent text-paper">
+        <div className="shell py-16 md:py-20">
+          <div className="grid gap-8 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-8">
+              <p className="mono text-paper/60">07 / The next project</p>
+              <p className="type-h2 mt-4 text-paper">
+                Have a challenge of your own? Let us look at it from six angles.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 md:col-span-4 md:justify-end">
+              <Link href="/contact" className="btn btn-light">
                 Start a conversation
               </Link>
               <Link
                 href={`/work/${nextProject.slug}`}
-                className="btn border-paper text-paper hover:bg-paper hover:text-ink"
+                className="btn border-paper/40 text-paper hover:bg-paper hover:text-ink"
               >
                 Next: {nextProject.title}
               </Link>
@@ -237,5 +190,27 @@ export default async function ProjectPage({
         </div>
       </section>
     </main>
+  );
+}
+
+function SectionBlock({
+  number,
+  title,
+  children,
+}: {
+  number: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid gap-6 md:grid-cols-12 md:gap-8">
+      <div className="md:col-span-3">
+        <div className="md:sticky md:top-20">
+          <p className="mono">{number}</p>
+          <h2 className="type-h3 mt-2">{title}</h2>
+        </div>
+      </div>
+      <div className="md:col-span-9">{children}</div>
+    </div>
   );
 }
