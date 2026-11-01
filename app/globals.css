@@ -536,13 +536,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  body,
-  a,
-  button,
-  input,
-  select,
-  textarea,
-  label {
+  .has-custom-cursor,
+  .has-custom-cursor a,
+  .has-custom-cursor button,
+  .has-custom-cursor input,
+  .has-custom-cursor select,
+  .has-custom-cursor textarea,
+  .has-custom-cursor label {
     cursor: none;
   }
 }

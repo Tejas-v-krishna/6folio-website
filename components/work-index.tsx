@@ -68,18 +68,18 @@ export default function WorkIndex() {
                 <div
                   key={project.slug}
                   className={
-                    index === 0
-                      ? "md:col-span-6"
-                      : index === 1
+                    index % 3 === 2
+                      ? "md:col-span-12 md:mt-4"
+                      : index % 3 === 1
                         ? "md:col-span-6 md:mt-16"
-                        : "md:col-span-12 md:mt-4"
+                        : "md:col-span-6"
                   }
                 >
                   <ScrollReveal delay={index * 0.06}>
                     <ProjectCard
                       project={project}
                       aspect={
-                        index === 2
+                        index % 3 === 2
                           ? "aspect-[16/10] md:aspect-[2.15/1]"
                           : "aspect-[4/5]"
                       }

@@ -17,12 +17,11 @@ export default function PageTransition({ children }: { children: React.ReactNode
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap.fromTo(
           el,
-          { opacity: 0, y: 28 },
+          { opacity: 0 },
           {
             opacity: 1,
-            y: 0,
-            duration: 0.65,
-            ease: "power3.out",
+            duration: 0.5,
+            ease: "power2.out",
             immediateRender: false,
           }
         );

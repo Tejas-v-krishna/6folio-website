@@ -13,7 +13,9 @@ export default function Cursor() {
     const el = ref.current;
     if (!el) return;
 
+    document.body.classList.add("has-custom-cursor");
     el.style.opacity = "0";
+    gsap.set(el, { xPercent: -50, yPercent: -50 });
 
     const xTo = gsap.quickTo(el, "x", { duration: 0.18, ease: "power3.out" });
     const yTo = gsap.quickTo(el, "y", { duration: 0.18, ease: "power3.out" });
@@ -50,13 +52,14 @@ export default function Cursor() {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseover", onOver);
       document.removeEventListener("mouseout", onOut);
+      document.body.classList.remove("has-custom-cursor");
     };
   }, []);
 
   return (
     <div
       ref={ref}
-      className="pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white mix-blend-difference"
+      className="pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 rounded-full bg-white mix-blend-difference"
       aria-hidden="true"
     />
   );

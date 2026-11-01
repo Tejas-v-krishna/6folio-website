@@ -3,6 +3,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import SixMark from "@/components/six-mark";
 
 function Mark() {
   const group = useRef<THREE.Group>(null);
@@ -96,6 +97,7 @@ function Mark() {
 export default function HeroMark3D() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(true);
+  const [webgl, setWebgl] = useState(true);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -105,8 +107,28 @@ export default function HeroMark3D() {
       { threshold: 0 }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    const fallback = window.setTimeout(() => {
+      if (!gl) setWebgl(false);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(fallback);
+      observer.disconnect();
+    };
   }, []);
+
+  if (!webgl) {
+    return (
+      <div className="h-full w-full">
+        <SixMark />
+      </div>
+    );
+  }
 
   return (
     <div ref={wrapRef} className="h-full w-full">

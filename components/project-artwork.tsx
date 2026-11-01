@@ -1,4 +1,4 @@
-type Variant = "serein" | "goodkind" | "northstar";
+type Variant = "serein" | "goodkind" | "northstar" | "mira" | "field";
 
 type Palette = {
   bg: string;
@@ -29,6 +29,20 @@ const palettes: Record<Variant, Palette> = {
     accent: "#1a2bff",
     soft: "#1c1c1c",
     muted: "#8a8a82",
+  },
+  mira: {
+    bg: "#cfe0d4",
+    ink: "#171a18",
+    accent: "#b06a8a",
+    soft: "#a9c7b2",
+    muted: "#4f6a58",
+  },
+  field: {
+    bg: "#f0c9a8",
+    ink: "#1c1712",
+    accent: "#ff5a1f",
+    soft: "#d9a97f",
+    muted: "#6b4a33",
   },
 };
 
@@ -62,8 +76,120 @@ export default function ProjectArtwork({
         {variant === "northstar" && (
           <Northstar p={p} scene={scene} title={title} />
         )}
+        {variant === "mira" && <Mira p={p} scene={scene} title={title} />}
+        {variant === "field" && <Field p={p} scene={scene} title={title} />}
       </svg>
     </div>
+  );
+}
+
+function Mira({ p, scene, title }: { p: Palette; scene: number; title?: string }) {
+  if (scene === 1) {
+    return (
+      <>
+        <rect x="90" y="90" width="1020" height="720" fill="none" stroke={p.ink} strokeWidth="2" />
+        <rect x="300" y="280" width="170" height="330" rx="24" fill={p.accent} />
+        <rect x="360" y="240" width="50" height="50" fill={p.ink} />
+        <rect x="560" y="360" width="220" height="250" rx="110" fill={p.soft} stroke={p.ink} strokeWidth="2" />
+        <circle cx="840" cy="300" r="90" fill={p.ink} />
+      </>
+    );
+  }
+
+  if (scene === 2) {
+    return (
+      <>
+        <text x="80" y="300" fontFamily="var(--font-sans)" fontSize="150" fontWeight="700" letterSpacing="-8" fill={p.ink}>
+          fewer
+        </text>
+        <text x="80" y="440" fontFamily="var(--font-sans)" fontSize="150" fontWeight="700" letterSpacing="-8" fill={p.accent}>
+          better
+        </text>
+        <line x1="80" y1="520" x2="520" y2="520" stroke={p.ink} strokeWidth="2" />
+        <circle cx="900" cy="300" r="120" fill={p.soft} />
+      </>
+    );
+  }
+
+  if (scene === 3) {
+    return (
+      <>
+        <rect x="120" y="120" width="960" height="660" fill={p.ink} />
+        <rect x="180" y="180" width="840" height="540" fill={p.bg} />
+        <circle cx="600" cy="450" r="160" fill={p.soft} />
+        <rect x="540" y="330" width="120" height="240" rx="20" fill={p.accent} />
+        <line x1="180" y1="450" x2="1020" y2="450" stroke={p.ink} strokeWidth="1" opacity="0.4" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <g stroke={p.ink} strokeWidth="1" opacity="0.3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <line key={`h${i}`} x1="0" y1={120 + i * 110} x2="1200" y2={120 + i * 110} />
+        ))}
+      </g>
+      <rect x="200" y="430" width="180" height="330" rx="26" fill={p.accent} />
+      <rect x="260" y="390" width="60" height="50" fill={p.ink} />
+      <rect x="470" y="500" width="220" height="260" rx="110" fill={p.soft} stroke={p.ink} strokeWidth="2" />
+      <circle cx="870" cy="320" r="120" fill={p.ink} />
+      <circle cx="870" cy="320" r="52" fill={p.bg} />
+      <text x="80" y="840" fontFamily="var(--font-sans)" fontSize="78" fontWeight="700" letterSpacing="-3" fill={p.ink}>
+        {title ?? "Mira Skincare"}
+      </text>
+    </>
+  );
+}
+
+function Field({ p, scene, title }: { p: Palette; scene: number; title?: string }) {
+  if (scene === 1) {
+    return (
+      <>
+        <path d="M0 700 L280 420 L480 620 L760 300 L1200 700" stroke={p.ink} strokeWidth="3" fill="none" />
+        <circle cx="900" cy="240" r="90" fill={p.accent} />
+        <path d="M0 760 L1200 760" stroke={p.ink} strokeWidth="2" />
+        <path d="M80 700 Q 400 620, 720 700 T 1120 700" stroke={p.muted} strokeWidth="1" fill="none" />
+      </>
+    );
+  }
+
+  if (scene === 2) {
+    return (
+      <>
+        <text x="80" y="300" fontFamily="var(--font-sans)" fontSize="140" fontWeight="700" letterSpacing="-7" fill={p.ink}>
+          built for
+        </text>
+        <text x="80" y="440" fontFamily="var(--font-sans)" fontSize="140" fontWeight="700" letterSpacing="-7" fill={p.accent}>
+          the long
+        </text>
+        <text x="80" y="580" fontFamily="var(--font-sans)" fontSize="140" fontWeight="700" letterSpacing="-7" fill={p.ink}>
+          walk
+        </text>
+      </>
+    );
+  }
+
+  if (scene === 3) {
+    return (
+      <>
+        <rect x="120" y="120" width="960" height="660" fill={p.ink} />
+        <rect x="180" y="180" width="840" height="540" fill={p.bg} />
+        <path d="M180 620 L460 360 L700 540 L980 240 L1020 620 Z" fill={p.soft} stroke={p.ink} strokeWidth="2" />
+        <circle cx="840" cy="280" r="60" fill={p.accent} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <path d="M0 760 L260 430 L470 650 L720 340 L1200 760" stroke={p.ink} strokeWidth="3" fill="none" />
+      <circle cx="900" cy="280" r="110" fill={p.accent} />
+      <path d="M0 820 L1200 820" stroke={p.ink} strokeWidth="2" />
+      <text x="80" y="840" fontFamily="var(--font-sans)" fontSize="78" fontWeight="700" letterSpacing="-3" fill={p.ink}>
+        {title ?? "Field and Forge"}
+      </text>
+    </>
   );
 }
 

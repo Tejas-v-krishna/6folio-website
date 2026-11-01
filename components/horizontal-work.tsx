@@ -57,7 +57,7 @@ export default function HorizontalWork() {
         ref={trackRef}
         className="flex flex-col gap-6 px-6 pb-16 pt-8 md:flex-row md:gap-10 md:px-10 md:pt-10"
       >
-        {projects.map((project) => (
+        {projects.slice(0, 3).map((project) => (
           <div
             key={project.slug}
             className="w-full md:min-w-[74vw] lg:min-w-[70vw]"

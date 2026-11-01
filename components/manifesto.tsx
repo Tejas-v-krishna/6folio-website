@@ -34,7 +34,7 @@ export default function Manifesto({ items }: { items: ManifestoItem[] }) {
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: () => `+=${window.innerHeight * 2.6}`,
+            end: () => `+=${Math.max(0, track.scrollHeight - viewport.clientHeight)}`,
             pin: true,
             scrub: 0.7,
             invalidateOnRefresh: true,

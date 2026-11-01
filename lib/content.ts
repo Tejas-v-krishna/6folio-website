@@ -325,7 +325,7 @@ export type Project = {
   year: string;
   principle: string;
   description: string;
-  artwork: "serein" | "goodkind" | "northstar";
+  artwork: "serein" | "goodkind" | "northstar" | "mira" | "field";
   surface: "orange" | "mint" | "ink";
   brief: string;
   opportunity: string;
@@ -491,7 +491,7 @@ export const projects: Project[] = [
     principle: "Fewer products, more reason.",
     description:
       "A visual identity and commerce experience for a skincare concept built on a small, honest product range and a calm, editorial tone.",
-    artwork: "goodkind",
+    artwork: "mira",
     brief:
       "Mira Skincare is a fictional skincare label created for this study. The brief was to build a brand and e-commerce experience for a small range of products with a clear point of view: fewer products, more reason. The audience is tired of cluttered shelves and louder-than-necessary claims.",
     opportunity:
@@ -538,7 +538,7 @@ export const projects: Project[] = [
     principle: "Built for the long walk.",
     description:
       "A campaign concept for an outdoor gear brand, built around the idea of equipment that earns its place over years, not seasons.",
-    artwork: "serein",
+    artwork: "field",
     brief:
       "Field and Forge is a fictional outdoor gear brand created for this study. The brief was to introduce the brand through the idea of equipment that earns its place over years, not seasons. The audience is not an enthusiast who tracks gear specs. It is someone who wants one good jacket, one good pack, and the confidence that both will last.",
     opportunity:
@@ -570,6 +570,53 @@ export const projects: Project[] = [
       { caption: "Campaign study: built for the long walk, expressed as type and daylight.", scene: 1 },
       { caption: "Photography study: weather, surfaces, and the details that survive.", scene: 2 },
       { caption: "Social study: a repeatable vertical format for the four-part series.", scene: 3 },
+    ],
+  },
+  {
+    slug: "common-ground",
+    title: "Common Ground",
+    category: "Hospitality concept",
+    industry: "Hospitality and members' clubs",
+    type: "Brand direction, photography, social content, and digital experience",
+    services: ["Brand direction", "Content and storytelling", "Photography and film", "Social and community", "Web and digital experience"],
+    surface: "orange",
+    label: "Independent concept project",
+    year: "2026",
+    principle: "A room worth returning to.",
+    description:
+      "A brand and digital experience for a neighbourhood members' club, built around the people, rituals, and rooms that make a place feel like yours.",
+    artwork: "serein",
+    brief:
+      "Common Ground is a fictional neighbourhood members' club created for this study. The brief was to build a brand and digital experience that communicated belonging without exclusivity. The club needed to feel considered and warm, not members-only in the restrictive sense.",
+    opportunity:
+      "Most members' clubs sell status. Common Ground's opportunity was to sell familiarity. The work needed to show the room at the end of the day, the regular at the corner table, the staff who remember how you take your coffee. Belonging is built from small repetitions, not a membership card.",
+    direction:
+      "The direction was built around the idea of a room worth returning to. A warm palette, close, observational photography, and a digital experience that shows the space before it asks for a booking. The identity uses a simple geometric mark and a generous editorial layout.",
+    work:
+      "The concept includes a visual identity, a photography system, a social content plan, a membership enquiry flow, and a responsive website structure. The work is designed to show the club honestly: the rooms, the people, and the rituals that make it feel lived in.",
+    details: [
+      {
+        title: "Show the room first",
+        description:
+          "The homepage opens with the space, not the membership. The photography shows the light, the furniture, and the small details that tell a visitor what the club feels like.",
+      },
+      {
+        title: "Membership without the gate",
+        description:
+          "The enquiry flow is simple and human. It asks what brings you in, not how much you earn. The tone stays warm and direct.",
+      },
+      {
+        title: "A social rhythm",
+        description:
+          "The content plan follows the club's week: quiet mornings, long lunches, evening events. The system gives the team a practical rhythm without turning the feed into a noticeboard.",
+      },
+    ],
+    measure:
+      "If launched, success would be measured against qualified membership enquiries, tour bookings, and the share of visitors who return to the site within a month. These are proposed measures, not achieved results.",
+    gallery: [
+      { caption: "Identity study: the mark, the room, and the return visit.", scene: 1 },
+      { caption: "Photography study: light, furniture, and the details that make a room.", scene: 2 },
+      { caption: "Digital study: the space before the ask.", scene: 3 },
     ],
   },
 ];

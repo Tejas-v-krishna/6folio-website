@@ -10,6 +10,7 @@ const menuItems = [
   { label: "What we do", href: "/services" },
   { label: "How we work", href: "/approach" },
   { label: "About us", href: "/about" },
+  { label: "Notes", href: "/notes" },
   { label: "Contact", href: "/contact" },
 ];
 
