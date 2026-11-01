@@ -84,6 +84,10 @@ export default function SiteHeader() {
       menuTl.current = tl;
 
       return () => {
+        if (settleTimer.current !== null) {
+          window.clearTimeout(settleTimer.current);
+          settleTimer.current = null;
+        }
         tl.kill();
         menuTl.current = null;
       };
