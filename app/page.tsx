@@ -4,7 +4,6 @@ import ScrollReveal from "@/components/scroll-reveal";
 import Marquee from "@/components/marquee";
 import Manifesto from "@/components/manifesto";
 import Accordion from "@/components/accordion";
-import SixMark from "@/components/six-mark";
 import StudioCard from "@/components/studio-card";
 import ProjectCard from "@/components/project-card";
 import { services, projects, questions, studioFacts } from "@/lib/content";
@@ -30,13 +29,7 @@ export default function HomePage() {
           aria-hidden="true"
         />
 
-        <div className="shell relative flex min-h-[78svh] flex-col justify-between pb-8 pt-5 md:min-h-[calc(100svh-190px)] md:pb-10 md:pt-6">
-          <div className="flex flex-1 items-center justify-center py-2 md:py-0">
-            <div className="h-[38vh] w-full max-w-[780px] md:h-[54vh]">
-              <SixMark />
-            </div>
-          </div>
-
+        <div className="shell relative flex min-h-[54svh] flex-col justify-end pb-8 pt-5 md:min-h-[62svh] md:pb-10 md:pt-6">
           <div className="relative z-20 flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
             <div className="max-w-sm">
               <p className="type-body-lg text-ink-soft">
