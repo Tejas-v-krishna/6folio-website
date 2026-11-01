@@ -29,6 +29,10 @@ export default function SiteHeader() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
+  const canHover = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   useGSAP(
     () => {
       const header = headerRef.current;
@@ -238,6 +242,7 @@ export default function SiteHeader() {
                   className="flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem]"
                   aria-current={isActive(item.href) ? "page" : undefined}
                   onMouseEnter={(event) => {
+                    if (!canHover()) return;
                     gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
                       x: 8,
                       duration: 0.4,
@@ -245,6 +250,7 @@ export default function SiteHeader() {
                     });
                   }}
                   onMouseLeave={(event) => {
+                    if (!canHover()) return;
                     gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
                       x: 0,
                       duration: 0.35,
