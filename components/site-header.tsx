@@ -110,6 +110,7 @@ export default function SiteHeader() {
       tl?.progress(1);
       return;
     }
+    tl?.invalidate();
     tl?.play();
     settleTimer.current = window.setTimeout(() => {
       if (tl && tl.progress() < 1) tl.progress(1);
