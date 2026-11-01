@@ -68,13 +68,18 @@ export default async function ProjectPage({
       <section className="overflow-hidden border-b border-rule">
         <div className="h-[52vh] md:h-[72vh]">
           <Parallax className="h-full" amount={7} scale={1.14}>
-            <ProjectArtwork
-              variant={project.artwork}
-              scene={0}
-              title={project.title}
-              ariaLabel={`Cover artwork for ${project.title}`}
+            <div
               className="h-full w-full"
-            />
+              style={{ viewTransitionName: "project-cover" }}
+            >
+              <ProjectArtwork
+                variant={project.artwork}
+                scene={0}
+                title={project.title}
+                ariaLabel={`Cover artwork for ${project.title}`}
+                className="h-full w-full"
+              />
+            </div>
           </Parallax>
         </div>
       </section>

@@ -107,6 +107,12 @@
   }
 }
 
+::view-transition-old(project-cover),
+::view-transition-new(project-cover) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @layer components {
   .shell {
     width: 100%;

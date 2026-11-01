@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRef } from "react";
 import ProjectArtwork from "@/components/project-artwork";
 import Parallax from "@/components/parallax";
 import type { Project } from "@/lib/content";
@@ -21,10 +22,19 @@ export default function ProjectCard({
   parallax?: boolean;
 }) {
   const dark = project.surface === "ink";
+  const artworkRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <article className="project-card group">
-      <Link href={`/work/${project.slug}`} className="block">
+      <Link
+        href={`/work/${project.slug}`}
+        className="block"
+        onClick={() => {
+          if (artworkRef.current) {
+            artworkRef.current.style.viewTransitionName = "project-cover";
+          }
+        }}
+      >
         <div className={`project-surface ${surfaces[project.surface]}`}>
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 p-4 md:p-6">
             <span className={`badge ${dark ? "border-paper/40 text-paper" : ""}`}>
@@ -35,7 +45,7 @@ export default function ProjectCard({
           <div className={`${aspect} w-full pt-12 md:pt-14`}>
             {parallax ? (
               <Parallax className="h-full w-full" amount={4} scale={1.05}>
-                <div className="project-art h-full w-full">
+                <div ref={artworkRef} className="project-art h-full w-full">
                   <ProjectArtwork
                     variant={project.artwork}
                     scene={0}
@@ -46,7 +56,7 @@ export default function ProjectCard({
                 </div>
               </Parallax>
             ) : (
-              <div className="project-art h-full w-full">
+              <div ref={artworkRef} className="project-art h-full w-full">
                 <ProjectArtwork
                   variant={project.artwork}
                   scene={0}
