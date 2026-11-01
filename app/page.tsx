@@ -4,7 +4,8 @@ import ScrollReveal from "@/components/scroll-reveal";
 import Marquee from "@/components/marquee";
 import Manifesto from "@/components/manifesto";
 import Accordion from "@/components/accordion";
-import HeroSculpture from "@/components/hero-sculpture";
+import SixMark from "@/components/six-mark";
+import StudioCard from "@/components/studio-card";
 import ProjectCard from "@/components/project-card";
 import { services, projects, questions, studioFacts } from "@/lib/content";
 
@@ -24,47 +25,42 @@ export default function HomePage() {
       </h1>
 
       <section className="relative overflow-hidden border-b border-rule">
-        <div className="shell pb-10 pt-6 md:pb-14 md:pt-10">
-          <div className="flex items-center justify-between gap-4 border-b border-rule pb-3">
+        <div
+          className="pointer-events-none absolute inset-3 z-10 border border-accent/35 md:inset-4"
+          aria-hidden="true"
+        />
+
+        <div className="shell relative flex min-h-[78svh] flex-col justify-between pb-8 pt-5 md:min-h-[calc(100svh-190px)] md:pb-10 md:pt-6">
+          <div className="flex items-center justify-between gap-4">
             <span className="mono">Independent creative growth studio</span>
             <span className="mono hidden md:block">Scroll to explore</span>
-            <span className="mono">2026</span>
+            <span className="mono">01 / 06</span>
           </div>
 
-          <div className="grid gap-8 pt-8 md:grid-cols-12 md:items-center md:pt-10">
-            <div className="order-2 md:order-1 md:col-span-3">
-              <p className="mono leading-relaxed">
-                We build brands people notice, content people remember, and digital
-                experiences that move business forward.
+          <div className="flex flex-1 items-center justify-center py-2 md:py-0">
+            <div className="h-[38vh] w-full max-w-[780px] md:h-[54vh]">
+              <SixMark />
+            </div>
+          </div>
+
+          <div className="relative z-20 flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-sm">
+              <p className="type-body-lg text-ink-soft">
+                We turn ambitious ideas into brands, products, and digital experiences
+                people believe in.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/work" className="btn btn-primary">
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link href="/contact" className="btn btn-primary">
+                  Build with us
+                </Link>
+                <Link href="/work" className="btn btn-secondary">
                   Explore our work
                 </Link>
-                <Link href="/contact" className="btn btn-secondary">
-                  Start a project
-                </Link>
               </div>
-              <p className="mono mt-6">Six collaborators. Connected disciplines.</p>
             </div>
 
-            <div className="order-1 h-[44vh] md:order-2 md:col-span-6 md:h-[64vh]">
-              <HeroSculpture />
-            </div>
-
-            <div className="order-3 md:col-span-3">
-              <div className="border border-rule p-4">
-                <p className="mono">Studio note / 001</p>
-                <p className="type-h4 mt-4">Six perspectives. One clear direction.</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  Strategy, content, image, motion, growth, and digital experience
-                  working from one brief.
-                </p>
-              </div>
-              <div className="mt-4 flex items-center justify-between border-t border-rule pt-3">
-                <span className="mono">01 / 06</span>
-                <span className="mono">Independent</span>
-              </div>
+            <div className="w-full md:w-[280px]">
+              <StudioCard />
             </div>
           </div>
         </div>

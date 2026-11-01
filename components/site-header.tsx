@@ -27,27 +27,21 @@ export default function SiteHeader() {
 
   return (
     <header className="relative z-40">
-      <div className="shell">
-        <div className="flex items-center justify-between gap-4 border-b border-rule py-3">
-          <span className="mono">Independent creative growth studio</span>
-          <span className="mono hidden md:block">Six perspectives. One clear direction.</span>
-          <span className="mono">Est. 2026</span>
-        </div>
-
-        <div className="py-5 md:py-8">
-          <Link href="/" aria-label={`${site.name} home`} className="group block w-full">
-            <span className="type-mega flex items-start">
-              6FOLIO
-              <sup className="mt-[0.35em] ml-1 text-[0.16em] font-normal tracking-normal transition-transform duration-300 group-hover:-translate-y-1">
-                ™
-              </sup>
-            </span>
-          </Link>
-        </div>
+      <div className="shell pt-5 md:pt-7">
+        <Link href="/" aria-label={`${site.name} home`} className="group block w-full">
+          <span className="type-mega flex items-start">
+            6FOLIO
+            <sup className="mt-[0.35em] ml-1 text-[0.16em] font-normal tracking-normal transition-transform duration-300 group-hover:-translate-y-1">
+              ™
+            </sup>
+          </span>
+        </Link>
       </div>
 
-      <div className="sticky top-0 z-50 border-y border-rule bg-paper/92 backdrop-blur-md">
-        <div className="shell flex h-12 items-center justify-between gap-6">
+      <div className="sticky top-0 z-50 mt-4 border-y border-rule bg-paper/92 backdrop-blur-md md:mt-6">
+        <div className="shell flex h-11 items-center justify-between gap-6">
+          <span className="mono hidden lg:block">Independent creative growth studio</span>
+
           <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
             {site.nav.map((item) => (
               <Link
@@ -73,7 +67,7 @@ export default function SiteHeader() {
             </Link>
             <button
               type="button"
-              className="flex h-9 items-center gap-2 border border-rule px-3 md:hidden"
+              className="flex h-8 items-center gap-2 border border-rule px-3 md:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? "Close navigation" : "Open navigation"}
@@ -124,9 +118,7 @@ export default function SiteHeader() {
             >
               Start a project
             </Link>
-            <p className="mono mt-6">
-              Six perspectives. One clear direction.
-            </p>
+            <p className="mono mt-6">Six perspectives. One clear direction.</p>
           </div>
         </div>
       </div>

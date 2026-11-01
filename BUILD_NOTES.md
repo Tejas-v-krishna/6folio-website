@@ -6,7 +6,7 @@ A complete first release of the 6FOLIO website, rebuilt around an oversized edit
 
 Routes:
 
-- `/` Home: oversized wordmark, sculptural six-arch hero, discipline marquee, studio statement, selected work, pinned six-discipline manifesto, studio facts, questions accordion, closing CTA.
+- `/` Home: oversized wordmark, a centred extruded hexagonal 6F mark with stone and electric blue gradients, a thin blue frame, bottom-left studio statement and CTA, bottom-right selected work card, discipline marquee, studio statement, selected work, pinned six-discipline manifesto, studio facts, questions accordion, closing CTA.
 - `/work` Work index with service filters and three labelled concept projects.
 - `/work/[slug]` Case-study template for Serein Objects, Goodkind Coffee, and Northstar Work.
 - `/services` Six service pillars with an animated accordion.
