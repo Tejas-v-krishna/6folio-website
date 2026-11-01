@@ -235,7 +235,7 @@ export default function SiteHeader() {
                   href={item.href}
                   onClick={closeMenu}
                   data-menu-item
-                  className="flex items-center justify-between border-b border-[#303030] px-6 py-5 text-[1.35rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323]"
+                  className="flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem]"
                   aria-current={isActive(item.href) ? "page" : undefined}
                   onMouseEnter={(event) => {
                     gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
@@ -265,7 +265,7 @@ export default function SiteHeader() {
                 href="/approach"
                 onClick={closeMenu}
                 data-menu-action
-                className="flex w-full items-center justify-center border border-[#4a4a4a] px-4 py-3 text-[0.68rem] uppercase tracking-[0.12em] text-[#f2f0e9]/80 transition-colors hover:border-[#f2f0e9] hover:text-[#f2f0e9]"
+                className="flex w-full items-center justify-center border border-[#4a4a4a] px-4 py-2.5 text-[0.6rem] uppercase tracking-[0.1em] text-[#f2f0e9]/80 transition-colors hover:border-[#f2f0e9] hover:text-[#f2f0e9] md:py-3 md:text-[0.68rem] md:tracking-[0.12em]"
               >
                 Our approach
               </Link>
@@ -275,15 +275,15 @@ export default function SiteHeader() {
                   href="/work"
                   onClick={closeMenu}
                   data-menu-action
-                  className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                  className="flex items-center justify-center bg-[#f2f0e9] px-2 py-2.5 text-center text-[0.6rem] uppercase leading-tight tracking-[0.06em] text-[#0a0a0a] transition-colors hover:bg-white md:px-3 md:py-3 md:text-[0.68rem] md:tracking-[0.08em]"
                 >
-                  Explore our work
+                  Our work
                 </Link>
                 <Link
                   href="/contact"
                   onClick={closeMenu}
                   data-menu-action
-                  className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                  className="flex items-center justify-center bg-[#f2f0e9] px-2 py-2.5 text-center text-[0.6rem] uppercase leading-tight tracking-[0.06em] text-[#0a0a0a] transition-colors hover:bg-white md:px-3 md:py-3 md:text-[0.68rem] md:tracking-[0.08em]"
                 >
                   Start a project
                 </Link>
