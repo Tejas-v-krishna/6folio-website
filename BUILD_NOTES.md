@@ -20,7 +20,8 @@ Routes:
 
 - Warm paper background, near-black ink, electric blue signal colour, with orange, mint, and dark project surfaces.
 - Inter Tight is the only typeface across the site, including headings, labels, navigation, buttons, forms, and project artwork.
-- Oversized `6FOLIO™` wordmark at the top of every page and in the blue footer.
+- Oversized `6FOLIO™` wordmark in the homepage hero and in the blue footer.
+- Dark floating navigation bar with a pixel 6F mark, centred studio line, and a full-height menu containing the primary routes and two cream calls to action.
 - Thin six-column grid overlay, editorial rules, section numbering, and asymmetric project layouts.
 - Original SVG project artwork rather than stock photography.
 - No invented clients, metrics, testimonials, awards, contact details, team names, or outcomes.

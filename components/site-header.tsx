@@ -3,15 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { site } from "@/lib/site";
 
-const leftLinks = [
-  { label: "About", href: "/about" },
+const menuItems = [
   { label: "Work", href: "/work" },
-];
-
-const rightLinks = [
-  { label: "Services", href: "/services" },
+  { label: "What we do", href: "/services" },
+  { label: "How we work", href: "/approach" },
+  { label: "About us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -36,96 +33,136 @@ export default function SiteHeader() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
-    <header className="fixed inset-x-0 top-3 z-50 px-3 md:top-4">
-      <div className="relative mx-auto flex h-14 w-full max-w-[600px] items-center justify-center rounded-xl border border-rule bg-[#fbfaf7]/95 px-4 shadow-[0_12px_40px_rgba(10,10,10,0.08)] backdrop-blur-md md:px-6">
-        <nav
-          className="absolute left-6 hidden items-center gap-6 md:flex"
-          aria-label="Primary"
-        >
-          {leftLinks.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={`mono link-underline transition-colors hover:text-ink ${
-                isActive(item.href) ? "text-accent" : "text-ink"
-              }`}
-              aria-current={isActive(item.href) ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <Link
-          href="/"
-          aria-label={`${site.name} home`}
-          className="shrink-0 text-[1.45rem] font-bold leading-none tracking-[-0.045em] text-ink"
-        >
-          6FOLIO
-          <sup className="ml-0.5 align-top text-[0.55em] font-normal tracking-normal">™</sup>
-        </Link>
-
-        <nav
-          className="absolute right-6 hidden items-center gap-6 md:flex"
-          aria-label="Primary"
-        >
-          {rightLinks.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={`mono link-underline transition-colors hover:text-ink ${
-                isActive(item.href) ? "text-accent" : "text-ink"
-              }`}
-              aria-current={isActive(item.href) ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
+    <>
+      {open && (
         <button
           type="button"
-          className="absolute right-4 flex h-9 items-center gap-2 border border-rule px-3 md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label={open ? "Close navigation" : "Open navigation"}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="mono mono-ink">{open ? "Close" : "Menu"}</span>
-        </button>
-      </div>
-
-      {open && (
-        <div
-          id="mobile-nav"
-          className="mx-auto mt-2 w-full max-w-[600px] rounded-xl border border-rule bg-[#fbfaf7] p-4 shadow-[0_24px_60px_rgba(10,10,10,0.12)] md:hidden"
-        >
-          <nav className="flex flex-col" aria-label="Mobile">
-            {site.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`border-b border-rule py-3 text-xl font-semibold tracking-tight ${
-                  isActive(item.href) ? "text-accent" : "text-ink"
-                }`}
-                aria-current={isActive(item.href) ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <Link
-            href="/contact"
-            onClick={() => setOpen(false)}
-            className="btn btn-primary mt-4 w-full"
-          >
-            Start a project
-          </Link>
-        </div>
+          className="fixed inset-0 z-40 cursor-default bg-ink/45 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+          aria-label="Close navigation"
+        />
       )}
-    </header>
+
+      <header className="fixed inset-x-0 top-3 z-50 px-3 md:top-4">
+        <div className="mx-auto w-full max-w-[600px] overflow-hidden rounded-lg border border-[#3a3a3a] bg-[#1b1b1b] text-[#f2f0e9] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+          <div className="relative flex h-12 items-center justify-between px-4">
+            <Link href="/" aria-label="6FOLIO home" className="flex items-center">
+              <PixelMark />
+            </Link>
+
+            <span className="mono absolute left-1/2 -translate-x-1/2 text-[#f2f0e9]/60">
+              Six perspectives
+            </span>
+
+            <button
+              type="button"
+              className="relative ml-auto flex h-10 w-10 items-center justify-end"
+              aria-expanded={open}
+              aria-controls="site-menu"
+              aria-label={open ? "Close navigation" : "Open navigation"}
+              onClick={() => setOpen((value) => !value)}
+            >
+              <span className="relative block h-4 w-5" aria-hidden="true">
+                <span
+                  className={`absolute left-0 h-[2px] w-5 bg-[#f2f0e9] transition-transform duration-300 ${
+                    open ? "top-1/2 rotate-45" : "top-0"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 top-1/2 h-[2px] w-5 -translate-y-1/2 bg-[#f2f0e9] transition-opacity duration-300 ${
+                    open ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 h-[2px] w-5 bg-[#f2f0e9] transition-transform duration-300 ${
+                    open ? "top-1/2 -rotate-45" : "top-full"
+                  }`}
+                />
+              </span>
+            </button>
+          </div>
+
+          {open && (
+            <div id="site-menu" className="max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]">
+              <nav aria-label="Primary">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between border-b border-[#303030] px-6 py-5 text-[1.35rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323]"
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                  >
+                    <span>{item.label}</span>
+                    {isActive(item.href) && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+                    )}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="p-3">
+                <Link
+                  href="/approach"
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center justify-center border border-[#4a4a4a] px-4 py-3 text-[0.68rem] uppercase tracking-[0.12em] text-[#f2f0e9]/80 transition-colors hover:border-[#f2f0e9] hover:text-[#f2f0e9]"
+                >
+                  Our approach
+                </Link>
+
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/work"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                  >
+                    Explore our work
+                  </Link>
+                  <Link
+                    href="/contact"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                  >
+                    Start a project
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+    </>
+  );
+}
+
+function PixelMark() {
+  const cells = [
+    // 6
+    [0, 0], [1, 0], [2, 0],
+    [0, 1],
+    [0, 2], [1, 2], [2, 2],
+    [0, 3], [2, 3],
+    [0, 4], [1, 4], [2, 4],
+    // F
+    [4, 0], [5, 0], [6, 0],
+    [4, 1],
+    [4, 2], [5, 2], [6, 2],
+    [4, 3],
+    [4, 4],
+  ];
+
+  return (
+    <svg
+      width="24"
+      height="18"
+      viewBox="0 0 21 15"
+      aria-hidden="true"
+      fill="currentColor"
+      className="text-[#f2f0e9]"
+    >
+      {cells.map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x * 3} y={y * 3} width="3" height="3" />
+      ))}
+    </svg>
   );
 }
