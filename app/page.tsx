@@ -31,12 +31,6 @@ export default function HomePage() {
         />
 
         <div className="shell relative flex min-h-[78svh] flex-col justify-between pb-8 pt-5 md:min-h-[calc(100svh-190px)] md:pb-10 md:pt-6">
-          <div className="flex items-center justify-between gap-4">
-            <span className="mono">Independent creative growth studio</span>
-            <span className="mono hidden md:block">Scroll to explore</span>
-            <span className="mono">01 / 06</span>
-          </div>
-
           <div className="flex flex-1 items-center justify-center py-2 md:py-0">
             <div className="h-[38vh] w-full max-w-[780px] md:h-[54vh]">
               <SixMark />
@@ -81,90 +75,65 @@ export default function HomePage() {
 
       <section className="border-b border-rule">
         <div className="shell py-16 md:py-24">
-          <div className="grid gap-8 md:grid-cols-12">
-            <div className="md:col-span-3">
-              <p className="mono">The studio / 01</p>
-            </div>
-            <div className="md:col-span-9">
-              <SplitReveal
-                as="h2"
-                text="One brief. Six ways of looking at it."
-                className="type-h2 max-w-4xl text-balance"
-                type="lines"
-              />
-              <div className="mt-10 grid gap-8 md:grid-cols-2">
-                <ScrollReveal>
-                  <p className="type-body-lg text-ink-soft">
-                    6FOLIO is an{" "}
-                    <span className="text-accent">independent creative growth studio</span>{" "}
-                    connecting strategy, brand, content, production, marketing, and
-                    digital experience. A brand is not built in separate pieces. The words
-                    affect the visuals, the visuals shape the campaign, and the campaign
-                    leads people to an experience.
-                  </p>
-                </ScrollReveal>
-                <ScrollReveal delay={0.1}>
-                  <p className="text-muted">
-                    We bring the people behind those decisions into the same
-                    conversation. That means fewer disconnected outputs and more
-                    thought behind how everything fits together.
-                  </p>
-                  <Link href="/about" className="mono link-underline mt-6 inline-block">
-                    About the studio
-                  </Link>
-                </ScrollReveal>
-              </div>
-            </div>
+          <SplitReveal
+            as="h2"
+            text="One brief. Six ways of looking at it."
+            className="type-h2 max-w-4xl text-balance"
+            type="lines"
+          />
+          <div className="mt-10 grid gap-8 md:grid-cols-2">
+            <ScrollReveal>
+              <p className="type-body-lg text-ink-soft">
+                6FOLIO is an{" "}
+                <span className="text-accent">independent creative growth studio</span>{" "}
+                connecting strategy, brand, content, production, marketing, and digital
+                experience. A brand is not built in separate pieces. The words affect the
+                visuals, the visuals shape the campaign, and the campaign leads people to
+                an experience.
+              </p>
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <p className="text-muted">
+                We bring the people behind those decisions into the same conversation.
+                That means fewer disconnected outputs and more thought behind how
+                everything fits together.
+              </p>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       <section className="border-b border-rule">
         <div className="shell py-16 md:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-6 border-b border-rule pb-6">
-            <div>
-              <p className="mono mb-3">Selected work / 02</p>
-              <SplitReveal as="h2" text="Our work" className="type-hero" />
-            </div>
-            <Link href="/work" className="mono link-underline">
-              See all work (03)
-            </Link>
+          <div className="border-b border-rule pb-6">
+            <SplitReveal as="h2" text="Our work" className="type-hero" />
           </div>
 
           <div className="mt-8 grid gap-10 md:grid-cols-12 md:gap-8">
             <div className="md:col-span-6">
-              <ProjectCard project={projects[0]} index={0} aspect="aspect-[4/5]" />
+              <ProjectCard project={projects[0]} aspect="aspect-[4/5]" compact />
             </div>
             <div className="md:col-span-6 md:mt-20">
-              <ProjectCard project={projects[1]} index={1} aspect="aspect-[4/5]" />
+              <ProjectCard project={projects[1]} aspect="aspect-[4/5]" compact />
             </div>
             <div className="md:col-span-12 md:mt-4">
               <ProjectCard
                 project={projects[2]}
-                index={2}
                 aspect="aspect-[16/10] md:aspect-[2.15/1]"
+                compact
               />
             </div>
           </div>
 
-          <p className="mono mt-8 max-w-lg leading-relaxed">
-            All three projects are independent concept studies by 6FOLIO. No client
-            relationship or measured result is implied.
-          </p>
         </div>
       </section>
 
-      <Manifesto
-        items={manifestoItems}
-        eyebrow="What we do / 03"
-        note="Six disciplines. One connected process."
-      />
+      <Manifesto items={manifestoItems} />
 
       <section className="border-b border-rule">
         <div className="shell py-16 md:py-24">
           <div className="grid gap-10 md:grid-cols-12">
             <div className="md:col-span-4">
-              <p className="mono mb-3">The studio / 04</p>
               <SplitReveal
                 as="h2"
                 text="New studio. Not new to this."
@@ -187,9 +156,8 @@ export default function HomePage() {
                     className="grid gap-3 border-b border-rule py-5 md:grid-cols-12 md:items-baseline md:gap-4"
                     delay={index * 0.05}
                   >
-                    <span className="mono md:col-span-1">0{index + 1}</span>
                     <h3 className="type-h4 md:col-span-4">{fact.title}</h3>
-                    <p className="text-sm leading-relaxed text-muted md:col-span-7">
+                    <p className="text-sm leading-relaxed text-muted md:col-span-8">
                       {fact.description}
                     </p>
                   </ScrollReveal>
@@ -204,7 +172,6 @@ export default function HomePage() {
         <div className="shell py-16 md:py-24">
           <div className="grid gap-10 md:grid-cols-12">
             <div className="md:col-span-4">
-              <p className="mono mb-3">Before we work together / 05</p>
               <SplitReveal
                 as="h2"
                 text="Questions worth asking."
@@ -222,7 +189,6 @@ export default function HomePage() {
                 items={questions.map((question) => ({
                   id: question.id,
                   title: question.question,
-                  meta: "Q",
                   content: <p className="max-w-2xl text-muted">{question.answer}</p>,
                 }))}
               />

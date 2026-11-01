@@ -11,15 +11,7 @@ export type ManifestoItem = {
   description: string;
 };
 
-export default function Manifesto({
-  items,
-  eyebrow = "What we do",
-  note = "Six disciplines. One connected process.",
-}: {
-  items: ManifestoItem[];
-  eyebrow?: string;
-  note?: string;
-}) {
+export default function Manifesto({ items }: { items: ManifestoItem[] }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -73,37 +65,14 @@ export default function Manifesto({
   return (
     <section ref={sectionRef} className="relative bg-ink text-paper">
       <div className="shell flex min-h-[100svh] flex-col justify-center py-16 md:py-20">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-3">
-          <span className="mono text-paper/50">{eyebrow}</span>
-          <span className="mono text-paper/50">{note}</span>
-          <span className="mono text-paper/50 md:hidden">Scroll through the six</span>
-        </div>
-
         <div className="grid flex-1 items-center gap-8 md:grid-cols-12">
           <div className="order-2 md:order-1 md:col-span-3">
             <div className="border border-white/15 p-5">
-              <p className="mono text-paper/50">
-                {items[active].index} / {items[active].label}
-              </p>
-              <p className="type-h4 mt-5 text-paper">{items[active].short}</p>
+              <p className="type-h4 text-paper">{items[active].short}</p>
               <p className="mt-4 text-sm leading-relaxed text-paper/55">
                 {items[active].description}
               </p>
             </div>
-
-            <div className="mt-6 flex items-center gap-2" aria-hidden="true">
-              {items.map((item, index) => (
-                <span
-                  key={item.index}
-                  className={`h-px flex-1 transition-colors duration-300 ${
-                    index === active ? "bg-accent" : "bg-white/20"
-                  }`}
-                />
-              ))}
-            </div>
-            <p className="mono mt-3 text-paper/40">
-              0{active + 1} / 0{items.length}
-            </p>
           </div>
 
           <div className="order-1 md:order-2 md:col-span-9">
@@ -115,9 +84,6 @@ export default function Manifesto({
                     className="manifesto-item flex h-[54vh] flex-col justify-center md:h-[64vh]"
                     data-active={index === active}
                   >
-                    <p className="mono mb-4 text-paper/40">
-                      {item.index} / SIX DISCIPLINES
-                    </p>
                     <h2 className="manifesto-word">{item.title}</h2>
                     <p className="mt-5 max-w-lg text-sm text-paper/55 md:text-base">
                       {item.short}

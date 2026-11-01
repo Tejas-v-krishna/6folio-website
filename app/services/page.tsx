@@ -18,10 +18,6 @@ export default function ServicesPage() {
     <main>
       <section className="border-b border-rule">
         <div className="shell pb-12 pt-10 md:pb-16 md:pt-16">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="mono">Our capabilities / 01</p>
-            <p className="mono">06 disciplines</p>
-          </div>
           <SplitReveal
             as="h1"
             text="The right mix of thinking and making."
@@ -40,77 +36,55 @@ export default function ServicesPage() {
 
       <section className="border-b border-rule">
         <div className="shell py-12 md:py-16">
-          <div className="grid gap-8 md:grid-cols-12">
-            <div className="md:col-span-3">
-              <p className="mono">How it connects / 02</p>
-            </div>
-            <div className="md:col-span-9">
-              <ScrollReveal>
-                <h2 className="type-h2 max-w-4xl">
-                  Built to connect, not to sit in silos.
-                </h2>
-                <p className="type-body-lg mt-6 max-w-2xl text-muted">
-                  You can work with us on one focused requirement or bring us in across a
-                  larger project. Either way, we start by understanding the objective and
-                  agreeing on what good work needs to achieve.
-                </p>
-              </ScrollReveal>
-            </div>
-          </div>
+          <ScrollReveal>
+            <h2 className="type-h2 max-w-4xl">
+              Built to connect, not to sit in silos.
+            </h2>
+            <p className="type-body-lg mt-6 max-w-2xl text-muted">
+              You can work with us on one focused requirement or bring us in across a
+              larger project. Either way, we start by understanding the objective and
+              agreeing on what good work needs to achieve.
+            </p>
+          </ScrollReveal>
         </div>
       </section>
 
       <section className="border-b border-rule">
         <div className="shell py-12 md:py-16">
-          <div className="grid gap-10 md:grid-cols-12">
-            <div className="md:col-span-3">
-              <div className="md:sticky md:top-20">
-                <p className="mono">The six / 03</p>
-                <p className="type-h3 mt-3">Six disciplines. One connected process.</p>
-                <p className="mt-4 text-sm leading-relaxed text-muted">
-                  Open a discipline to see what it can include. Not every project needs
-                  all six.
-                </p>
-              </div>
-            </div>
-
-            <div className="md:col-span-9">
-              <Accordion
-                defaultOpen={services[0].slug}
-                items={services.map((service) => ({
-                  id: service.slug,
-                  title: service.title,
-                  meta: service.index,
-                  content: (
-                    <div className="grid gap-8 md:grid-cols-12">
-                      <div className="md:col-span-7">
-                        <p className="type-body-lg text-ink-soft">{service.summary}</p>
-                        <p className="mono mt-6">Outcome</p>
-                        <p className="mt-2 text-sm text-muted">{service.outcome}</p>
-                        {service.note && (
-                          <p className="mt-5 text-sm italic leading-relaxed text-muted">
-                            {service.note}
-                          </p>
-                        )}
-                      </div>
-                      <div className="md:col-span-5">
-                        <p className="mono mb-3">Can include</p>
-                        <ul className="space-y-2">
-                          {service.deliverables.map((item) => (
-                            <li key={item} className="flex gap-3 text-sm text-ink-soft">
-                              <span className="text-accent" aria-hidden="true">
-                                /
-                              </span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+          <div className="mx-auto max-w-5xl">
+            <h2 className="type-h2 mb-10">Six disciplines. One connected process.</h2>
+            <Accordion
+              defaultOpen={services[0].slug}
+              items={services.map((service) => ({
+                id: service.slug,
+                title: service.title,
+                content: (
+                  <div className="grid gap-8 md:grid-cols-12">
+                    <div className="md:col-span-7">
+                      <p className="type-body-lg text-ink-soft">{service.summary}</p>
+                      <p className="mt-4 text-sm text-muted">{service.outcome}</p>
+                      {service.note && (
+                        <p className="mt-5 text-sm italic leading-relaxed text-muted">
+                          {service.note}
+                        </p>
+                      )}
                     </div>
-                  ),
-                }))}
-              />
-            </div>
+                    <div className="md:col-span-5">
+                      <ul className="space-y-2">
+                        {service.deliverables.map((item) => (
+                          <li key={item} className="flex gap-3 text-sm text-ink-soft">
+                            <span className="text-accent" aria-hidden="true">
+                              /
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ),
+              }))}
+            />
           </div>
         </div>
       </section>
@@ -119,8 +93,7 @@ export default function ServicesPage() {
         <div className="shell py-16 md:py-20">
           <div className="grid gap-8 md:grid-cols-12 md:items-end">
             <div className="md:col-span-8">
-              <p className="mono text-paper/60">Not sure which service you need?</p>
-              <h2 className="type-h2 mt-4 text-paper">
+              <h2 className="type-h2 text-paper">
                 That is a useful place to start.
               </h2>
               <p className="mt-6 max-w-xl text-paper/75">

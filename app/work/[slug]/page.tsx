@@ -49,38 +49,18 @@ export default async function ProjectPage({
             Back to all work
           </Link>
 
-          <div className="mt-10 grid gap-10 md:grid-cols-12 md:items-end">
-            <div className="md:col-span-8">
-              <p className="mono">
-                {project.label} / {project.year}
-              </p>
-              <SplitReveal
-                as="h1"
-                text={project.title}
-                className="type-hero mt-4"
-                type="lines"
-                scroll={false}
-              />
-              <p className="type-body-lg mt-6 max-w-2xl text-muted">
-                {project.description}
-              </p>
-            </div>
-
-            <div className="md:col-span-4">
-              <dl className="border-t border-rule">
-                {[
-                  ["Project type", project.type],
-                  ["Industry", project.industry],
-                  ["Services", project.services.join(", ")],
-                  ["Label", "Independent concept project by 6FOLIO"],
-                ].map(([term, value]) => (
-                  <div key={term} className="grid grid-cols-2 gap-4 border-b border-rule py-3">
-                    <dt className="mono">{term}</dt>
-                    <dd className="text-sm leading-relaxed">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+          <div className="mt-10">
+            <span className="badge badge-blue">{project.label}</span>
+            <SplitReveal
+              as="h1"
+              text={project.title}
+              className="type-hero mt-5"
+              type="lines"
+              scroll={false}
+            />
+            <p className="type-body-lg mt-6 max-w-2xl text-muted">
+              {project.description}
+            </p>
           </div>
         </div>
       </section>
@@ -101,7 +81,6 @@ export default async function ProjectPage({
 
       <section className="border-b border-rule bg-ink text-paper">
         <div className="shell py-16 md:py-24">
-          <p className="mono text-paper/50">The central idea</p>
           <SplitReveal
             as="p"
             text={project.principle}
@@ -113,19 +92,19 @@ export default async function ProjectPage({
 
       <section className="border-b border-rule">
         <div className="shell space-y-16 py-16 md:space-y-24 md:py-24">
-          <SectionBlock number="01" title="The brief">
+          <SectionBlock title="The brief">
             <p className="type-body-lg text-ink-soft">{project.brief}</p>
           </SectionBlock>
 
-          <SectionBlock number="02" title="The opportunity">
+          <SectionBlock title="The opportunity">
             <p className="type-body-lg text-ink-soft">{project.opportunity}</p>
           </SectionBlock>
 
-          <SectionBlock number="03" title="The direction">
+          <SectionBlock title="The direction">
             <p className="type-body-lg text-ink-soft">{project.direction}</p>
           </SectionBlock>
 
-          <SectionBlock number="04" title="The work">
+          <SectionBlock title="The work">
             <p className="max-w-2xl text-muted">{project.work}</p>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {project.gallery.map((item, index) => (
@@ -139,13 +118,12 @@ export default async function ProjectPage({
                       className="h-full w-full"
                     />
                   </div>
-                  <p className="mono mt-3 leading-relaxed">{item.caption}</p>
                 </ScrollReveal>
               ))}
             </div>
           </SectionBlock>
 
-          <SectionBlock number="05" title="The details">
+          <SectionBlock title="The details">
             <div className="grid gap-8 md:grid-cols-3">
               {project.details.map((detail, index) => (
                 <ScrollReveal key={detail.title} delay={index * 0.06}>
@@ -160,7 +138,7 @@ export default async function ProjectPage({
             </div>
           </SectionBlock>
 
-          <SectionBlock number="06" title="The outcome or intended measure">
+          <SectionBlock title="The outcome or intended measure">
             <p className="type-body-lg text-ink-soft">{project.measure}</p>
           </SectionBlock>
         </div>
@@ -170,8 +148,7 @@ export default async function ProjectPage({
         <div className="shell py-16 md:py-20">
           <div className="grid gap-8 md:grid-cols-12 md:items-end">
             <div className="md:col-span-8">
-              <p className="mono text-paper/60">07 / The next project</p>
-              <p className="type-h2 mt-4 text-paper">
+              <p className="type-h2 text-paper">
                 Have a challenge of your own? Let us look at it from six angles.
               </p>
             </div>
@@ -194,11 +171,9 @@ export default async function ProjectPage({
 }
 
 function SectionBlock({
-  number,
   title,
   children,
 }: {
-  number: string;
   title: string;
   children: React.ReactNode;
 }) {
@@ -206,8 +181,7 @@ function SectionBlock({
     <div className="grid gap-6 md:grid-cols-12 md:gap-8">
       <div className="md:col-span-3">
         <div className="md:sticky md:top-20">
-          <p className="mono">{number}</p>
-          <h2 className="type-h3 mt-2">{title}</h2>
+          <h2 className="type-h3">{title}</h2>
         </div>
       </div>
       <div className="md:col-span-9">{children}</div>

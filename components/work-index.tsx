@@ -30,10 +30,6 @@ export default function WorkIndex() {
     <main>
       <section className="border-b border-rule">
         <div className="shell pb-10 pt-10 md:pb-14 md:pt-16">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="mono">Selected work and studies / 01</p>
-            <p className="mono">03 projects</p>
-          </div>
           <SplitReveal
             as="h1"
             text="The thinking behind the finished thing."
@@ -41,16 +37,10 @@ export default function WorkIndex() {
             type="lines"
             scroll={false}
           />
-          <div className="mt-8 grid gap-6 md:grid-cols-12">
-            <p className="type-body-lg max-w-2xl text-muted md:col-span-8">
-              A collection of projects, experiments, and self-initiated studies. Look
-              beyond the final image and into the choices that shaped the work.
-            </p>
-            <p className="mono md:col-span-4 md:text-right">
-              Every project is labelled by type. Concept work is never presented as a
-              client engagement.
-            </p>
-          </div>
+          <p className="type-body-lg mt-8 max-w-2xl text-muted">
+            A collection of projects, experiments, and self-initiated studies. Look
+            beyond the final image and into the choices that shaped the work.
+          </p>
         </div>
       </section>
 
@@ -68,9 +58,6 @@ export default function WorkIndex() {
                 {filter}
               </button>
             ))}
-            <span className="mono ml-auto">
-              0{visible.length} / 03
-            </span>
           </div>
 
           {visible.length === 0 ? (
@@ -91,7 +78,6 @@ export default function WorkIndex() {
                   <ScrollReveal delay={index * 0.06}>
                     <ProjectCard
                       project={project}
-                      index={index}
                       aspect={
                         index === 2
                           ? "aspect-[16/10] md:aspect-[2.15/1]"
@@ -107,7 +93,6 @@ export default function WorkIndex() {
           <div className="mt-16 border-t border-rule pt-10">
             <div className="grid gap-6 md:grid-cols-12 md:items-end">
               <div className="md:col-span-8">
-                <p className="mono mb-3">Have a challenge of your own?</p>
                 <h2 className="type-h2">Let us look at it from six angles.</h2>
               </div>
               <div className="md:col-span-4 md:justify-self-end">

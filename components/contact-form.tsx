@@ -267,9 +267,6 @@ export default function ContactForm() {
               {message}
             </p>
           )}
-          {status === "idle" && (
-            <p className="mono">We will use these details to respond to your enquiry.</p>
-          )}
         </div>
       </div>
 

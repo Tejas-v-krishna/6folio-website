@@ -40,8 +40,6 @@ export default function SiteHeader() {
 
       <div className="sticky top-0 z-50 mt-4 border-y border-rule bg-paper/92 backdrop-blur-md md:mt-6">
         <div className="shell flex h-11 items-center justify-between gap-6">
-          <span className="mono hidden lg:block">Independent creative growth studio</span>
-
           <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
             {site.nav.map((item) => (
               <Link
@@ -97,18 +95,17 @@ export default function SiteHeader() {
           }`}
         >
           <div className="shell flex flex-col py-4">
-            {site.nav.map((item, index) => (
+            {site.nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-baseline justify-between border-b border-rule py-4 ${
+                className={`border-b border-rule py-4 ${
                   isActive(item.href) ? "text-accent" : "text-ink"
                 }`}
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
                 <span className="type-h3">{item.label}</span>
-                <span className="mono">0{index + 1}</span>
               </Link>
             ))}
             <Link
@@ -118,7 +115,6 @@ export default function SiteHeader() {
             >
               Start a project
             </Link>
-            <p className="mono mt-6">Six perspectives. One clear direction.</p>
           </div>
         </div>
       </div>

@@ -153,16 +153,6 @@ export default function SixMark() {
           </text>
 
           <rect x="302" y="402" width="16" height="16" fill="#1a2bff" />
-
-          <g
-            fontFamily="var(--font-mono)"
-            fontSize="11"
-            letterSpacing="4"
-            fill="#6f6d66"
-          >
-            <text x="115" y="990">SIX PERSPECTIVES</text>
-            <text x="885" y="990" textAnchor="end">ONE CLEAR DIRECTION</text>
-          </g>
         </svg>
       </div>
     </div>

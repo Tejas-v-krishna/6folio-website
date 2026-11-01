@@ -11,12 +11,12 @@ const surfaces: Record<Project["surface"], string> = {
 
 export default function ProjectCard({
   project,
-  index,
   aspect = "aspect-[4/5] md:aspect-[4/3]",
+  compact = false,
 }: {
   project: Project;
-  index: number;
   aspect?: string;
+  compact?: boolean;
 }) {
   const dark = project.surface === "ink";
 
@@ -27,9 +27,6 @@ export default function ProjectCard({
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 p-4 md:p-6">
             <span className={`badge ${dark ? "border-paper/40 text-paper" : ""}`}>
               Concept project
-            </span>
-            <span className={`mono ${dark ? "text-paper/60" : "mono-ink"}`}>
-              0{index + 1} / 03
             </span>
           </div>
 
@@ -47,39 +44,22 @@ export default function ProjectCard({
             </Parallax>
           </div>
 
-          <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-4 p-4 md:p-6">
-            <span className={`mono ${dark ? "text-paper/60" : "mono-ink"}`}>
-              View project
-            </span>
+          <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-end p-4 md:p-6">
             <span className="arrow text-2xl leading-none" aria-hidden="true">
               ↗
             </span>
           </div>
         </div>
 
-        <div className="mt-4 flex items-start justify-between gap-6">
-          <div>
-            <h3 className="type-h3 transition-colors group-hover:text-accent">
-              {project.title}
-            </h3>
-            <p className="mono mt-2">
-              {project.category} / {project.industry}
-            </p>
-          </div>
-          <span className="mono shrink-0">{project.year}</span>
-        </div>
+        <h3 className="type-h3 mt-4 transition-colors group-hover:text-accent">
+          {project.title}
+        </h3>
 
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-          {project.description}
-        </p>
-
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {project.services.slice(0, 3).map((service) => (
-            <li key={service} className="badge">
-              {service}
-            </li>
-          ))}
-        </ul>
+        {!compact && (
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+            {project.description}
+          </p>
+        )}
       </Link>
     </article>
   );

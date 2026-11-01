@@ -38,10 +38,6 @@ export default function PrivacyPage() {
     <main>
       <section className="border-b border-rule">
         <div className="shell pb-12 pt-10 md:pb-16 md:pt-16">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="mono">Privacy / 01</p>
-            <p className="mono">Working draft</p>
-          </div>
           <SplitReveal
             as="h1"
             text="How we handle your information."
@@ -66,17 +62,15 @@ export default function PrivacyPage() {
                   className="grid gap-3 border-b border-rule py-6 md:grid-cols-12 md:gap-6"
                   delay={index * 0.04}
                 >
-                  <span className="mono md:col-span-1">0{index + 1}</span>
                   <h2 className="type-h4 md:col-span-4">{section.title}</h2>
-                  <p className="text-sm leading-relaxed text-muted md:col-span-7">
+                  <p className="text-sm leading-relaxed text-muted md:col-span-8">
                     {section.body}
                   </p>
                 </ScrollReveal>
               ))}
             </div>
             <div className="mt-10 bg-paper-2 p-6">
-              <p className="mono">Before launch</p>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="text-sm leading-relaxed text-muted">
                 A full privacy policy, data-handling explanation, retention period, and
                 confirmed contact route must be added before the enquiry form collects
                 live submissions.

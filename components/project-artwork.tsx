@@ -85,9 +85,6 @@ function Serein({ p, scene, title }: { p: Palette; scene: number; title?: string
           strokeWidth="3"
         />
         <circle cx="860" cy="270" r="76" fill={p.ink} />
-        <text x="90" y="168" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.ink}>
-          FORM STUDY / 02
-        </text>
       </>
     );
   }
@@ -107,9 +104,6 @@ function Serein({ p, scene, title }: { p: Palette; scene: number; title?: string
           objects
         </text>
         <line x1="80" y1="490" x2="520" y2="490" stroke={p.ink} strokeWidth="2" />
-        <text x="80" y="540" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="4" fill={p.ink}>
-          HONEST MATERIALS / QUIETER DESIGN
-        </text>
       </>
     );
   }
@@ -122,9 +116,6 @@ function Serein({ p, scene, title }: { p: Palette; scene: number; title?: string
         <circle cx="600" cy="450" r="170" fill={p.ink} />
         <circle cx="600" cy="450" r="84" fill={p.accent} />
         <line x1="180" y1="450" x2="1020" y2="450" stroke={p.ink} strokeWidth="1" opacity="0.5" />
-        <text x="200" y="800" fontFamily="var(--font-mono)" fontSize="16" letterSpacing="4" fill={p.muted}>
-          DETAIL / SEREIN OBJECTS
-        </text>
       </>
     );
   }
@@ -153,9 +144,6 @@ function Serein({ p, scene, title }: { p: Palette; scene: number; title?: string
       />
       <circle cx="920" cy="240" r="98" fill={p.ink} />
       <circle cx="920" cy="240" r="42" fill={p.bg} />
-      <text x="80" y="130" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.ink}>
-        SEREIN OBJECTS / 01
-      </text>
       <text x="80" y="840" fontFamily="var(--font-sans)" fontSize="78" fontWeight="700" letterSpacing="-3" fill={p.ink}>
         {title ?? "Serein Objects"}
       </text>
@@ -172,9 +160,6 @@ function Goodkind({ p, scene, title }: { p: Palette; scene: number; title?: stri
         <circle cx="600" cy="430" r="140" fill={p.accent} />
         <path d="M440 240 Q 600 170, 760 240" stroke={p.ink} strokeWidth="3" fill="none" />
         <path d="M500 200 Q 540 140, 600 165 Q 660 140, 700 200" stroke={p.ink} strokeWidth="2" fill="none" />
-        <text x="80" y="130" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.ink}>
-          CAMPAIGN STUDY / 02
-        </text>
         <text x="80" y="830" fontFamily="var(--font-sans)" fontSize="86" fontWeight="700" letterSpacing="-4" fill={p.ink}>
           Goodkind
         </text>
@@ -196,9 +181,6 @@ function Goodkind({ p, scene, title }: { p: Palette; scene: number; title?: stri
           <circle cx="940" cy="660" r="18" />
         </g>
         <path d="M260 660 L 600 740 L 940 660" stroke={p.ink} strokeWidth="2" fill="none" />
-        <text x="110" y="830" fontFamily="var(--font-mono)" fontSize="16" letterSpacing="4" fill={p.ink}>
-          HANDS / SURFACES / SMALL RITUALS
-        </text>
       </>
     );
   }
@@ -215,9 +197,6 @@ function Goodkind({ p, scene, title }: { p: Palette; scene: number; title?: stri
         </text>
         <circle cx="960" cy="220" r="70" fill={p.ink} />
         <line x1="120" y1="540" x2="1080" y2="540" stroke={p.ink} strokeWidth="1" />
-        <text x="120" y="600" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="4" fill={p.ink}>
-          A SOCIAL SYSTEM, NOT A CONTENT PILE
-        </text>
       </>
     );
   }
@@ -231,9 +210,6 @@ function Goodkind({ p, scene, title }: { p: Palette; scene: number; title?: stri
       <path d="M790 380 Q 855 330, 920 380" stroke={p.ink} strokeWidth="2" fill="none" />
       <rect x="760" y="440" width="190" height="14" fill={p.ink} />
       <rect x="760" y="470" width="140" height="14" fill={p.ink} opacity="0.5" />
-      <text x="110" y="200" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.ink}>
-        GOODKIND COFFEE / 02
-      </text>
       <text x="110" y="310" fontFamily="var(--font-sans)" fontSize="92" fontWeight="700" letterSpacing="-5" fill={p.ink}>
         the useful
       </text>
@@ -262,9 +238,6 @@ function Northstar({ p, scene, title }: { p: Palette; scene: number; title?: str
         <path d="M200 700 L 600 200 L 1000 700" stroke={p.accent} strokeWidth="3" fill="none" />
         <circle cx="600" cy="200" r="12" fill={p.accent} />
         <rect x="560" y="420" width="80" height="80" fill="none" stroke={p.ink} strokeWidth="2" />
-        <text x="90" y="130" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.muted}>
-          LAUNCH STUDY / 03
-        </text>
       </>
     );
   }
@@ -281,9 +254,6 @@ function Northstar({ p, scene, title }: { p: Palette; scene: number; title?: str
         <line x1="340" y1="310" x2="860" y2="310" stroke={p.accent} strokeWidth="3" />
         <circle cx="340" cy="310" r="8" fill={p.accent} />
         <circle cx="860" cy="310" r="8" fill={p.accent} />
-        <text x="160" y="620" fontFamily="var(--font-mono)" fontSize="16" letterSpacing="4" fill={p.muted}>
-          A WEEK IN SEQUENCE / NO INVENTED METRICS
-        </text>
       </>
     );
   }
@@ -324,9 +294,6 @@ function Northstar({ p, scene, title }: { p: Palette; scene: number; title?: str
         <circle cx="680" cy="620" r="10" />
         <circle cx="940" cy="180" r="10" />
       </g>
-      <text x="80" y="130" fontFamily="var(--font-mono)" fontSize="18" letterSpacing="6" fill={p.muted}>
-        NORTHSTAR WORK / 03
-      </text>
       <text x="80" y="840" fontFamily="var(--font-sans)" fontSize="78" fontWeight="700" letterSpacing="-3" fill={p.ink}>
         {title ?? "Northstar Work"}
       </text>
