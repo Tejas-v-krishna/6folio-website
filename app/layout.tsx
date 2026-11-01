@@ -62,6 +62,7 @@ export default function RootLayout({
         <ScrollProgress />
         <div className="relative z-10">
           <SiteHeader />
+          <div className="h-[4.75rem] md:h-[5.5rem]" aria-hidden="true" />
           {children}
           <SiteFooter />
         </div>

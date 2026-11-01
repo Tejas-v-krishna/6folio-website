@@ -5,6 +5,16 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { site } from "@/lib/site";
 
+const leftLinks = [
+  { label: "About", href: "/about" },
+  { label: "Work", href: "/work" },
+];
+
+const rightLinks = [
+  { label: "Services", href: "/services" },
+  { label: "Contact", href: "/contact" },
+];
+
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -26,28 +36,80 @@ export default function SiteHeader() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
-    <header className="relative z-40">
-      <div className="shell pt-5 md:pt-7">
-        <Link href="/" aria-label={`${site.name} home`} className="group block w-full">
-          <span className="type-mega flex items-start">
-            6FOLIO
-            <sup className="mt-[0.35em] ml-1 text-[0.16em] font-normal tracking-normal transition-transform duration-300 group-hover:-translate-y-1">
-              ™
-            </sup>
-          </span>
+    <header className="fixed inset-x-0 top-3 z-50 px-3 md:top-4">
+      <div className="relative mx-auto flex h-14 w-full max-w-[600px] items-center justify-center rounded-xl border border-rule bg-[#fbfaf7]/95 px-4 shadow-[0_12px_40px_rgba(10,10,10,0.08)] backdrop-blur-md md:px-6">
+        <nav
+          className="absolute left-6 hidden items-center gap-6 md:flex"
+          aria-label="Primary"
+        >
+          {leftLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className={`mono link-underline transition-colors hover:text-ink ${
+                isActive(item.href) ? "text-accent" : "text-ink"
+              }`}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <Link
+          href="/"
+          aria-label={`${site.name} home`}
+          className="shrink-0 text-[1.45rem] font-bold leading-none tracking-[-0.045em] text-ink"
+        >
+          6FOLIO
+          <sup className="ml-0.5 align-top text-[0.55em] font-normal tracking-normal">™</sup>
         </Link>
+
+        <nav
+          className="absolute right-6 hidden items-center gap-6 md:flex"
+          aria-label="Primary"
+        >
+          {rightLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className={`mono link-underline transition-colors hover:text-ink ${
+                isActive(item.href) ? "text-accent" : "text-ink"
+              }`}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <button
+          type="button"
+          className="absolute right-4 flex h-9 items-center gap-2 border border-rule px-3 md:hidden"
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          aria-label={open ? "Close navigation" : "Open navigation"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span className="mono mono-ink">{open ? "Close" : "Menu"}</span>
+        </button>
       </div>
 
-      <div className="sticky top-0 z-50 mt-4 border-y border-rule bg-paper/92 backdrop-blur-md md:mt-6">
-        <div className="shell flex h-11 items-center justify-between gap-6">
-          <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
+      {open && (
+        <div
+          id="mobile-nav"
+          className="mx-auto mt-2 w-full max-w-[600px] rounded-xl border border-rule bg-[#fbfaf7] p-4 shadow-[0_24px_60px_rgba(10,10,10,0.12)] md:hidden"
+        >
+          <nav className="flex flex-col" aria-label="Mobile">
             {site.nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`mono link-underline transition-colors hover:text-ink ${
-                  isActive(item.href) ? "mono-ink" : ""
+                className={`border-b border-rule py-3 text-xl font-semibold tracking-tight ${
+                  isActive(item.href) ? "text-accent" : "text-ink"
                 }`}
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
@@ -55,69 +117,15 @@ export default function SiteHeader() {
               </Link>
             ))}
           </nav>
-
-          <div className="flex flex-1 items-center justify-between gap-4 md:flex-none md:justify-end">
-            <Link
-              href="/contact"
-              className="mono link-underline text-accent transition-colors hover:text-ink"
-            >
-              Start a project
-            </Link>
-            <button
-              type="button"
-              className="flex h-8 items-center gap-2 border border-rule px-3 md:hidden"
-              aria-expanded={open}
-              aria-controls="mobile-nav"
-              aria-label={open ? "Close navigation" : "Open navigation"}
-              onClick={() => setOpen((value) => !value)}
-            >
-              <span className="mono mono-ink">{open ? "Close" : "Menu"}</span>
-              <span className="relative h-3 w-4" aria-hidden="true">
-                <span
-                  className={`absolute left-0 h-px w-4 bg-ink transition-transform ${
-                    open ? "top-1/2 rotate-45" : "top-0"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 h-px w-4 bg-ink transition-transform ${
-                    open ? "top-1/2 -rotate-45" : "top-full"
-                  }`}
-                />
-              </span>
-            </button>
-          </div>
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            className="btn btn-primary mt-4 w-full"
+          >
+            Start a project
+          </Link>
         </div>
-
-        <div
-          id="mobile-nav"
-          className={`mobile-nav-panel border-t border-rule bg-paper md:hidden ${
-            open ? "open" : ""
-          }`}
-        >
-          <div className="shell flex flex-col py-4">
-            {site.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`border-b border-rule py-4 ${
-                  isActive(item.href) ? "text-accent" : "text-ink"
-                }`}
-                aria-current={isActive(item.href) ? "page" : undefined}
-              >
-                <span className="type-h3">{item.label}</span>
-              </Link>
-            ))}
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className="btn btn-primary mt-5 w-full"
-            >
-              Start a project
-            </Link>
-          </div>
-        </div>
-      </div>
+      )}
     </header>
   );
 }

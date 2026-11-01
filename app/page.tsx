@@ -29,7 +29,16 @@ export default function HomePage() {
           aria-hidden="true"
         />
 
-        <div className="shell relative flex min-h-[54svh] flex-col justify-end pb-8 pt-5 md:min-h-[62svh] md:pb-10 md:pt-6">
+        <div className="shell relative flex min-h-[68svh] flex-col justify-between pb-8 pt-8 md:min-h-[76svh] md:pb-10 md:pt-10">
+          <div className="relative z-20">
+            <span className="type-mega flex items-start">
+              6FOLIO
+              <sup className="mt-[0.35em] ml-1 text-[0.16em] font-normal tracking-normal">
+                ™
+              </sup>
+            </span>
+          </div>
+
           <div className="relative z-20 flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
             <div className="max-w-sm">
               <p className="type-body-lg text-ink-soft">
