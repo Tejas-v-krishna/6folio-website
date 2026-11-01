@@ -19,7 +19,11 @@ export default function SiteHeader() {
   const headerRef = useRef<HTMLElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const menuTl = useRef<gsap.core.Timeline | null>(null);
+  const iconTl = useRef<gsap.core.Timeline | null>(null);
   const settleTimer = useRef<number | null>(null);
+  const lineTop = useRef<HTMLSpanElement | null>(null);
+  const lineMid = useRef<HTMLSpanElement | null>(null);
+  const lineBottom = useRef<HTMLSpanElement | null>(null);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
@@ -56,37 +60,55 @@ export default function SiteHeader() {
 
       const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "power3.inOut" },
+        defaults: { ease: "power3.out" },
       });
 
       tl.fromTo(
         panel,
-        { height: 0 },
+        { height: 0, opacity: 0.6 },
         {
           height: "auto",
-          duration: 0.45,
-          ease: "power3.inOut",
+          opacity: 1,
+          duration: 0.55,
+          ease: "expo.inOut",
         },
         0
       ).fromTo(
         [...actions, ...items],
         {
           opacity: 0,
-          y: -10,
+          y: -14,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.25,
-          stagger: 0.03,
+          duration: 0.42,
+          stagger: 0.035,
           ease: "power3.out",
+          force3D: true,
         },
-        0.18
+        0.08
       );
 
       // Start in the closed state.
       tl.progress(0);
       menuTl.current = tl;
+
+      const top = lineTop.current;
+      const mid = lineMid.current;
+      const bottom = lineBottom.current;
+
+      if (top && mid && bottom) {
+        const icon = gsap.timeline({
+          paused: true,
+          defaults: { ease: "power3.inOut" },
+        });
+        icon
+          .to(top, { y: 7, rotate: 45, duration: 0.25 }, 0)
+          .to(mid, { opacity: 0, duration: 0.15 }, 0)
+          .to(bottom, { y: -7, rotate: -45, duration: 0.25 }, 0);
+        iconTl.current = icon;
+      }
 
       return () => {
         if (settleTimer.current !== null) {
@@ -94,7 +116,9 @@ export default function SiteHeader() {
           settleTimer.current = null;
         }
         tl.kill();
+        iconTl.current?.kill();
         menuTl.current = null;
+        iconTl.current = null;
       };
     },
     { scope: headerRef }
@@ -110,28 +134,36 @@ export default function SiteHeader() {
   const openMenu = useCallback(() => {
     clearSettleTimer();
     const tl = menuTl.current;
+    const icon = iconTl.current;
     setOpen(true);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tl?.progress(1);
+      icon?.progress(1);
       return;
     }
     tl?.play();
+    icon?.play();
     settleTimer.current = window.setTimeout(() => {
       if (tl && tl.progress() === 0) tl.progress(1);
+      if (icon && icon.progress() === 0) icon.progress(1);
     }, 300);
   }, [clearSettleTimer]);
 
   const closeMenu = useCallback(() => {
     clearSettleTimer();
     const tl = menuTl.current;
+    const icon = iconTl.current;
     setOpen(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tl?.progress(0);
+      icon?.progress(0);
       return;
     }
     tl?.reverse();
+    icon?.reverse();
     settleTimer.current = window.setTimeout(() => {
       if (tl && tl.progress() === 1) tl.progress(0);
+      if (icon && icon.progress() === 1) icon.progress(0);
     }, 300);
   }, [clearSettleTimer]);
 
@@ -181,24 +213,9 @@ export default function SiteHeader() {
               onClick={() => (open ? closeMenu() : openMenu())}
             >
               <span className="relative block h-4 w-5" aria-hidden="true">
-                <span
-                  className="absolute left-0 h-[2px] w-5 bg-[#f2f0e9]"
-                  style={{
-                    top: open ? 7 : 0,
-                    transform: open ? "rotate(45deg)" : "none",
-                  }}
-                />
-                <span
-                  className="absolute left-0 top-[7px] h-[2px] w-5 bg-[#f2f0e9]"
-                  style={{ opacity: open ? 0 : 1 }}
-                />
-                <span
-                  className="absolute left-0 h-[2px] w-5 bg-[#f2f0e9]"
-                  style={{
-                    top: open ? 7 : 14,
-                    transform: open ? "rotate(-45deg)" : "none",
-                  }}
-                />
+                <span ref={lineTop} className="absolute left-0 top-0 h-[2px] w-5 bg-[#f2f0e9]" />
+                <span ref={lineMid} className="absolute left-0 top-[7px] h-[2px] w-5 bg-[#f2f0e9]" />
+                <span ref={lineBottom} className="absolute left-0 top-[14px] h-[2px] w-5 bg-[#f2f0e9]" />
               </span>
             </button>
           </div>
@@ -220,16 +237,16 @@ export default function SiteHeader() {
                   aria-current={isActive(item.href) ? "page" : undefined}
                   onMouseEnter={(event) => {
                     gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
-                      x: 6,
-                      duration: 0.3,
-                      ease: "power2.out",
+                      x: 8,
+                      duration: 0.4,
+                      ease: "power3.out",
                     });
                   }}
                   onMouseLeave={(event) => {
                     gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
                       x: 0,
-                      duration: 0.3,
-                      ease: "power2.out",
+                      duration: 0.35,
+                      ease: "power3.out",
                     });
                   }}
                 >
