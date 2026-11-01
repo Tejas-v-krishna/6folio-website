@@ -21,6 +21,7 @@ export default function SiteHeader() {
   const menuTl = useRef<gsap.core.Timeline | null>(null);
   const iconTl = useRef<gsap.core.Timeline | null>(null);
   const settleTimer = useRef<number | null>(null);
+  const closing = useRef(false);
   const lineTop = useRef<HTMLSpanElement | null>(null);
   const lineMid = useRef<HTMLSpanElement | null>(null);
   const lineBottom = useRef<HTMLSpanElement | null>(null);
@@ -63,25 +64,28 @@ export default function SiteHeader() {
         defaults: { ease: "power3.inOut" },
       });
 
-      tl.to([...actions, ...items], {
-        opacity: 0,
-        y: -10,
-        duration: 0.25,
-        stagger: 0.03,
-      })
-        .fromTo(
-          panel,
-          { height: "auto" },
-          {
-            height: 0,
-            duration: 0.45,
-            ease: "power3.inOut",
-          },
-          "-=0.1"
-        );
+      tl.fromTo(
+        panel,
+        { height: 0 },
+        {
+          height: "auto",
+          duration: 0.45,
+          ease: "power3.inOut",
+        },
+        0
+      ).from(
+        [...actions, ...items],
+        {
+          opacity: 0,
+          y: -10,
+          duration: 0.25,
+          stagger: 0.03,
+        },
+        0.18
+      );
 
       // Start in the closed state.
-      tl.progress(1);
+      tl.progress(0);
       menuTl.current = tl;
 
       const top = lineTop.current;
@@ -115,38 +119,66 @@ export default function SiteHeader() {
   }, []);
 
   const openMenu = useCallback(() => {
-    setOpen(true);
+    closing.current = false;
     clearSettleTimer();
     const tl = menuTl.current;
     const icon = iconTl.current;
+    tl?.eventCallback("onReverseComplete", null);
+    setOpen(true);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      tl?.progress(0);
+      tl?.progress(1);
       icon?.progress(1);
       return;
     }
-    tl?.reverse();
+    tl?.play();
     icon?.play();
     settleTimer.current = window.setTimeout(() => {
-      if (tl && tl.progress() === 1) tl.progress(0);
-      if (icon && icon.progress() === 0) icon.progress(1);
+      if (tl && tl.progress() < 1) tl.progress(1);
+      if (icon && icon.progress() < 1) icon.progress(1);
     }, 900);
   }, [clearSettleTimer]);
 
   const closeMenu = useCallback(() => {
-    setOpen(false);
-    clearSettleTimer();
     const tl = menuTl.current;
     const icon = iconTl.current;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      tl?.progress(1);
-      icon?.progress(0);
+
+    if (closing.current) return;
+    if (!tl) {
+      setOpen(false);
       return;
     }
-    tl?.play();
+    if (tl.progress() === 0) {
+      setOpen(false);
+      return;
+    }
+
+    closing.current = true;
+    clearSettleTimer();
+
+    const finish = () => {
+      if (settleTimer.current !== null) {
+        window.clearTimeout(settleTimer.current);
+        settleTimer.current = null;
+      }
+      closing.current = false;
+      setOpen(false);
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      tl.progress(0);
+      icon?.progress(0);
+      finish();
+      return;
+    }
+
+    tl.eventCallback("onReverseComplete", finish);
+    tl.reverse();
     icon?.reverse();
+
     settleTimer.current = window.setTimeout(() => {
-      if (tl && tl.progress() === 0) tl.progress(1);
-      if (icon && icon.progress() === 1) icon.progress(0);
+      if (tl.progress() > 0) tl.progress(0);
+      if (icon && icon.progress() > 0) icon.progress(0);
+      finish();
     }, 900);
   }, [clearSettleTimer]);
 
@@ -206,9 +238,8 @@ export default function SiteHeader() {
           <div
             ref={panelRef}
             id="site-menu"
-            style={{ height: 0 }}
             inert={!open}
-            className="max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]"
+            className="h-0 max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]"
           >
             <nav aria-label="Primary">
               {menuItems.map((item) => (
