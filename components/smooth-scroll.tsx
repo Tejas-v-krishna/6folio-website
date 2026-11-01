@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/components/gsap";
 
 export default function SmoothScroll() {
+  const pathname = usePathname();
+
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -30,6 +33,15 @@ export default function SmoothScroll() {
       gsap.ticker.remove(tick);
     };
   }, []);
+
+  // Recalculate all ScrollTrigger positions after route changes and
+  // after the page's pins and spacers have been created.
+  useEffect(() => {
+    const refresh = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 250);
+    return () => window.clearTimeout(refresh);
+  }, [pathname]);
 
   return null;
 }
