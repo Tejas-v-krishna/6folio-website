@@ -478,6 +478,100 @@ export const projects: Project[] = [
       { caption: "Launch study: the path from first visit to a qualified conversation.", scene: 3 },
     ],
   },
+  {
+    slug: "mira-skincare",
+    title: "Mira Skincare",
+    category: "Brand concept",
+    industry: "Beauty and personal care",
+    type: "Brand direction, photography, content, and e-commerce experience",
+    services: ["Brand direction", "Content and storytelling", "Photography and film", "Web and digital experience"],
+    surface: "mint",
+    label: "Independent concept project",
+    year: "2026",
+    principle: "Fewer products, more reason.",
+    description:
+      "A visual identity and commerce experience for a skincare concept built on a small, honest product range and a calm, editorial tone.",
+    artwork: "goodkind",
+    brief:
+      "Mira Skincare is a fictional skincare label created for this study. The brief was to build a brand and e-commerce experience for a small range of products with a clear point of view: fewer products, more reason. The audience is tired of cluttered shelves and louder-than-necessary claims.",
+    opportunity:
+      "The skincare category is loud. Most brands compete on ingredient lists, clinical language, or lifestyle imagery that has nothing to do with the product. Mira's opportunity was to be the opposite: quiet, specific, and useful. The product should feel considered, not marketed.",
+    direction:
+      "The direction was built around calm clarity. A mint and cream palette, close-up product photography with natural light, and copy that explains what each product does without exaggeration. The identity uses a single thin rule and generous spacing to let the product breathe.",
+    work:
+      "The concept includes a wordmark and visual direction, a product photography system, responsive product page layouts, an editorial story structure, and a content plan for the first collection. Every image was art directed for the concept.",
+    details: [
+      {
+        title: "Product first, promise second",
+        description:
+          "Product pages open with a close-up image and a one-line description of what the product does. The ingredient list and usage follow, not precede.",
+      },
+      {
+        title: "Calm, not clinical",
+        description:
+          "The tone is specific and warm. No before-and-after imagery, no percentages, no invented trial results. The product speaks through the image and the explanation.",
+      },
+      {
+        title: "One range, one rhythm",
+        description:
+          "The product grid uses a single column on mobile and a calm two-column layout on desktop. The spacing is generous. The next step is always close.",
+      },
+    ],
+    measure:
+      "If launched, success would be measured against qualified product enquiries, add-to-cart rate, and the share of visitors who reach a second product. These are proposed measures, not achieved results.",
+    gallery: [
+      { caption: "Identity study: mark, thin rule, and range numbering.", scene: 1 },
+      { caption: "Art direction study: product forms, surface, and material detail.", scene: 2 },
+      { caption: "Commerce study: product story, supporting detail, and next step.", scene: 3 },
+    ],
+  },
+  {
+    slug: "field-and-forge",
+    title: "Field and Forge",
+    category: "Campaign concept",
+    industry: "Outdoor and lifestyle",
+    type: "Campaign concept, film, photography, and social content",
+    services: ["Content and storytelling", "Photography and film", "Social and community", "Marketing and growth"],
+    surface: "orange",
+    label: "Independent concept project",
+    year: "2026",
+    principle: "Built for the long walk.",
+    description:
+      "A campaign concept for an outdoor gear brand, built around the idea of equipment that earns its place over years, not seasons.",
+    artwork: "serein",
+    brief:
+      "Field and Forge is a fictional outdoor gear brand created for this study. The brief was to introduce the brand through the idea of equipment that earns its place over years, not seasons. The audience is not an enthusiast who tracks gear specs. It is someone who wants one good jacket, one good pack, and the confidence that both will last.",
+    opportunity:
+      "Outdoor brands usually sell performance. Field and Forge's opportunity was to sell durability and honesty. Show the jacket at the end of a long walk, not at the start. Show the pack with a repair patch, not fresh from the factory. Let the wear be the proof.",
+    direction:
+      "The idea was built for the long walk. A campaign built around endurance, honest materials, and the small rituals of outdoor life. Warm daylight, hands, weathered surfaces, and imperfect conditions. The visual language pairs wide landscape frames with close detail shots. Copy stays plain and observational, with no performance claims.",
+    work:
+      "The concept includes a 60-second brand film treatment, a four-part vertical series, a stills library, a social content system, and caption guidelines. The rollout is designed to work across a shop window, a phone screen, and a paid social placement without losing its tone.",
+    details: [
+      {
+        title: "Wear as proof",
+        description:
+          "The campaign shows equipment after use, not before. The jacket is wet. The pack has a patch. The boots are scuffed. The wear tells the story.",
+      },
+      {
+        title: "One idea, several formats",
+        description:
+          "The film, stills, and social edits are planned together. Each asset has its own job, but all of them return to the same set of rituals rather than becoming separate campaigns.",
+      },
+      {
+        title: "A social system, not a content pile",
+        description:
+          "Four repeating content types give the team a practical publishing rhythm. The system leaves room for community replies and behind-the-scenes moments instead of filling every slot in advance.",
+      },
+    ],
+    measure:
+      "If launched, the concept would be assessed on recall among local customers, saves and shares on the ritual series, and the number of people who use the campaign's in-store prompt. These are proposed measures, not achieved results.",
+    gallery: [
+      { caption: "Campaign study: built for the long walk, expressed as type and daylight.", scene: 1 },
+      { caption: "Photography study: weather, surfaces, and the details that survive.", scene: 2 },
+      { caption: "Social study: a repeatable vertical format for the four-part series.", scene: 3 },
+    ],
+  },
 ];
 
 export function getProject(slug: string): Project | undefined {
@@ -488,6 +582,63 @@ export function getNextProject(slug: string): Project {
   const index = projects.findIndex((project) => project.slug === slug);
   return projects[(index + 1) % projects.length];
 }
+
+export type Note = {
+  slug: string;
+  title: string;
+  date: string;
+  readingTime: string;
+  excerpt: string;
+  body: string[];
+};
+
+export const notes: Note[] = [
+  {
+    slug: "why-six-perspectives",
+    title: "Why six perspectives beat one generalist",
+    date: "2026",
+    readingTime: "4 min read",
+    excerpt:
+      "A generalist can do a lot of things adequately. Six specialists working from one brief can do them well, and the work holds together.",
+    body: [
+      "A generalist can do a lot of things adequately. Six specialists working from one brief can do them well, and the work holds together.",
+      "The difference is not talent. It is attention. A photographer notices light. A writer notices rhythm. A developer notices friction. A growth lead notices audience. A client partner notices the person behind the brief. None of those observations is replaceable by the others.",
+      "When one person does all of it, the observations blur. The work gets made, but it gets made from a single angle. That angle is usually the one the person is most comfortable with, not the one the problem needs.",
+      "Six perspectives do not mean six people doing six separate jobs. It means six people looking at the same problem early, when the decisions are still cheap to change.",
+      "The number is not a gimmick. It is a reminder that good work is rarely the product of one way of seeing.",
+    ],
+  },
+  {
+    slug: "the-brief-is-the-project",
+    title: "The brief is the project",
+    date: "2026",
+    readingTime: "3 min read",
+    excerpt:
+      "Most projects do not fail in execution. They fail in the brief, where the objective was never agreed clearly enough to judge against.",
+    body: [
+      "Most projects do not fail in execution. They fail in the brief, where the objective was never agreed clearly enough to judge against.",
+      "A brief is not a list of deliverables. It is a shared understanding of what needs to change, for whom, and how we will know if it worked. Without that, every decision becomes a matter of opinion.",
+      "We spend a disproportionate amount of time at the start of a project. Not because we are slow, but because the cost of a wrong assumption compounds. A wrong assumption in week one becomes a wrong direction by week four, and a wrong outcome by week eight.",
+      "The best briefs are short. They name the problem, the audience, the constraint, and the measure. Everything else is a decision, not a given.",
+      "If the brief is unclear, we would rather pause than produce. A beautiful campaign against the wrong objective is still a failure.",
+    ],
+  },
+  {
+    slug: "concept-work-honestly",
+    title: "Concept work, labelled honestly",
+    date: "2026",
+    readingTime: "3 min read",
+    excerpt:
+      "A new studio has no client history. The honest response is to make the work anyway and label it clearly. The dishonest response is to invent one.",
+    body: [
+      "A new studio has no client history. The honest response is to make the work anyway and label it clearly. The dishonest response is to invent one.",
+      "Every project in our portfolio is self-initiated. We set the brief, defined the audience, and produced the work. The names are working names. The outcomes are intended measures, not achieved results.",
+      "This is not a compromise. A well-made concept project demonstrates more than a polished case study for a real client, because it shows the thinking without the safety of a real constraint. It shows what the team would do if trusted.",
+      "We label every piece of concept work as concept work. We do not invent client names, metrics, testimonials, or awards. If a project does not have evidence behind it, we say so.",
+      "The alternative is a portfolio full of claims that cannot be verified. That is not a portfolio. It is a brochure.",
+    ],
+  },
+];
 
 export const studioFacts = [
   {

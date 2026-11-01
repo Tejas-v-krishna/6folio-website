@@ -8,7 +8,7 @@ import StudioCard from "@/components/studio-card";
 import HorizontalWork from "@/components/horizontal-work";
 import Magnetic from "@/components/magnetic";
 import HeroMark3D from "@/components/hero-mark-3d";
-import { services, questions, studioFacts } from "@/lib/content";
+import { services, questions, studioFacts, notes } from "@/lib/content";
 
 const manifestoItems = services.map((service) => ({
   index: service.index,
@@ -155,6 +155,35 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-rule">
+        <div className="shell py-16 md:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-6 border-b border-rule pb-6">
+            <SplitReveal as="h2" text="Notes from the studio." className="type-h2" />
+            <Link href="/notes" className="mono link-underline">
+              Read all notes
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {notes.map((note, index) => (
+              <ScrollReveal key={note.slug} delay={index * 0.06}>
+                <Link href={`/notes/${note.slug}`} className="group block border-t border-rule pt-5">
+                  <p className="mono">
+                    {note.date} / {note.readingTime}
+                  </p>
+                  <h3 className="type-h3 mt-4 transition-colors group-hover:text-accent">
+                    {note.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                    {note.excerpt}
+                  </p>
+                </Link>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </section>
