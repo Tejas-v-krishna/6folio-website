@@ -5,6 +5,7 @@ import SplitReveal from "@/components/split-reveal";
 import ScrollReveal from "@/components/scroll-reveal";
 import Parallax from "@/components/parallax";
 import ProjectArtwork from "@/components/project-artwork";
+import FlipTransition from "@/components/flip-transition";
 import { getProject, getNextProject, projects } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 
@@ -66,12 +67,9 @@ export default async function ProjectPage({
       </section>
 
       <section className="overflow-hidden border-b border-rule">
-        <div className="h-[52vh] md:h-[72vh]">
-          <Parallax className="h-full" amount={7} scale={1.14}>
-            <div
-              className="h-full w-full"
-              style={{ viewTransitionName: "project-cover" }}
-            >
+        <FlipTransition slug={project.slug}>
+          <div className="h-[52vh] md:h-[72vh]">
+            <Parallax className="h-full" amount={7} scale={1.14}>
               <ProjectArtwork
                 variant={project.artwork}
                 scene={0}
@@ -79,9 +77,9 @@ export default async function ProjectPage({
                 ariaLabel={`Cover artwork for ${project.title}`}
                 className="h-full w-full"
               />
-            </div>
-          </Parallax>
-        </div>
+            </Parallax>
+          </div>
+        </FlipTransition>
       </section>
 
       <section className="border-b border-rule bg-ink text-paper">

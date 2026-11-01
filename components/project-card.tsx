@@ -31,7 +31,21 @@ export default function ProjectCard({
         className="block"
         onClick={() => {
           if (artworkRef.current) {
-            artworkRef.current.style.viewTransitionName = "project-cover";
+            const rect = artworkRef.current.getBoundingClientRect();
+            try {
+              window.sessionStorage.setItem(
+                "flipState",
+                JSON.stringify({
+                  slug: project.slug,
+                  top: rect.top,
+                  left: rect.left,
+                  width: rect.width,
+                  height: rect.height,
+                })
+              );
+            } catch {
+              // Ignore storage errors and fall back to a normal navigation.
+            }
           }
         }}
       >
