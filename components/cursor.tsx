@@ -7,6 +7,7 @@ export default function Cursor() {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (window.innerWidth < 1024) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
@@ -59,7 +60,7 @@ export default function Cursor() {
   return (
     <div
       ref={ref}
-      className="pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 rounded-full bg-white mix-blend-difference"
+      className="custom-cursor pointer-events-none fixed left-0 top-0 z-[70] h-3 w-3 rounded-full bg-white mix-blend-difference"
       aria-hidden="true"
     />
   );

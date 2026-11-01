@@ -31,6 +31,7 @@ export default function SiteHeader() {
 
   const canHover = () =>
     typeof window !== "undefined" &&
+    window.innerWidth >= 768 &&
     window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   useGSAP(
@@ -141,6 +142,12 @@ export default function SiteHeader() {
     const tl = menuTl.current;
     const icon = iconTl.current;
     setOpen(true);
+
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      document.querySelectorAll("[data-menu-label]").forEach((label) => {
+        gsap.set(label, { x: 0 });
+      });
+    }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tl?.progress(1);
       icon?.progress(1);
