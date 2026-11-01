@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SplitReveal from "@/components/split-reveal";
 import ScrollReveal from "@/components/scroll-reveal";
-import Marquee from "@/components/marquee";
+import LogoWall from "@/components/logo-wall";
 import Manifesto from "@/components/manifesto";
 import Accordion from "@/components/accordion";
 import StudioCard from "@/components/studio-card";
@@ -74,18 +74,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-rule py-3 md:py-4">
-        <Marquee
-          items={[
-            "Brand direction",
-            "Content and storytelling",
-            "Photography and film",
-            "Social and community",
-            "Marketing and growth",
-            "Web and digital experience",
-          ]}
-        />
-      </section>
+      <LogoWall />
 
       <section className="border-b border-rule">
         <div className="shell py-16 md:py-24">

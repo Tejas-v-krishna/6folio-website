@@ -29,11 +29,6 @@ export default function SiteHeader() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
-  const canHover = () =>
-    typeof window !== "undefined" &&
-    window.innerWidth >= 768 &&
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
   useGSAP(
     () => {
       const header = headerRef.current;
@@ -142,12 +137,6 @@ export default function SiteHeader() {
     const tl = menuTl.current;
     const icon = iconTl.current;
     setOpen(true);
-
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      document.querySelectorAll("[data-menu-label]").forEach((label) => {
-        gsap.set(label, { x: 0 });
-      });
-    }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tl?.progress(1);
       icon?.progress(1);
@@ -246,26 +235,12 @@ export default function SiteHeader() {
                   href={item.href}
                   onClick={closeMenu}
                   data-menu-item
-                  className="flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem]"
+                  className="menu-row flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem]"
                   aria-current={isActive(item.href) ? "page" : undefined}
-                  onMouseEnter={(event) => {
-                    if (!canHover()) return;
-                    gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
-                      x: 8,
-                      duration: 0.4,
-                      ease: "power3.out",
-                    });
-                  }}
-                  onMouseLeave={(event) => {
-                    if (!canHover()) return;
-                    gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
-                      x: 0,
-                      duration: 0.35,
-                      ease: "power3.out",
-                    });
-                  }}
                 >
-                  <span data-menu-label>{item.label}</span>
+                  <span data-menu-label className="menu-label inline-block">
+                    {item.label}
+                  </span>
                   {isActive(item.href) && (
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
                   )}
