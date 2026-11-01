@@ -68,13 +68,18 @@ export default function SiteHeader() {
           ease: "power3.inOut",
         },
         0
-      ).from(
+      ).fromTo(
         [...actions, ...items],
         {
           opacity: 0,
           y: -10,
+        },
+        {
+          opacity: 1,
+          y: 0,
           duration: 0.25,
           stagger: 0.03,
+          ease: "power3.out",
         },
         0.18
       );
@@ -110,11 +115,10 @@ export default function SiteHeader() {
       tl?.progress(1);
       return;
     }
-    tl?.invalidate();
     tl?.play();
     settleTimer.current = window.setTimeout(() => {
-      if (tl && tl.progress() < 1) tl.progress(1);
-    }, 600);
+      if (tl && tl.progress() === 0) tl.progress(1);
+    }, 300);
   }, [clearSettleTimer]);
 
   const closeMenu = useCallback(() => {
@@ -127,8 +131,8 @@ export default function SiteHeader() {
     }
     tl?.reverse();
     settleTimer.current = window.setTimeout(() => {
-      if (tl && tl.progress() > 0) tl.progress(0);
-    }, 600);
+      if (tl && tl.progress() === 1) tl.progress(0);
+    }, 300);
   }, [clearSettleTimer]);
 
   useEffect(() => {
