@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, useGSAP } from "@/components/gsap";
 
 const menuItems = [
@@ -18,7 +18,12 @@ export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const centerRef = useRef<HTMLSpanElement | null>(null);
+  const menuTl = useRef<gsap.core.Timeline | null>(null);
+  const iconTl = useRef<gsap.core.Timeline | null>(null);
+  const settleTimer = useRef<number | null>(null);
+  const lineTop = useRef<HTMLSpanElement | null>(null);
+  const lineMid = useRef<HTMLSpanElement | null>(null);
+  const lineBottom = useRef<HTMLSpanElement | null>(null);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
@@ -47,99 +52,109 @@ export default function SiteHeader() {
 
   useGSAP(
     () => {
-      const center = centerRef.current;
-      if (!center) return;
-
-      gsap.to(center, {
-        opacity: open ? 0 : 0.6,
-        y: open ? -6 : 0,
-        duration: 0.25,
-        ease: "power2.out",
-      });
-    },
-    { dependencies: [open] }
-  );
-
-  useGSAP(
-    () => {
-      if (!open) return;
       const panel = panelRef.current;
       if (!panel) return;
 
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const items = panel.querySelectorAll("[data-menu-item]");
-        const actions = panel.querySelectorAll("[data-menu-action]");
+      const items = panel.querySelectorAll("[data-menu-item]");
+      const actions = panel.querySelectorAll("[data-menu-action]");
 
-        gsap.fromTo(
-          panel,
-          { height: 0, opacity: 0 },
-          {
-            height: "auto",
-            opacity: 1,
-            duration: 0.45,
-            ease: "power3.out",
-            immediateRender: false,
-          }
-        );
-
-        gsap.from(items, {
-          y: 18,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.06,
-          delay: 0.1,
-          ease: "power3.out",
-          immediateRender: false,
-        });
-
-        gsap.from(actions, {
-          y: 12,
-          opacity: 0,
-          duration: 0.4,
-          stagger: 0.05,
-          delay: 0.24,
-          ease: "power3.out",
-          immediateRender: false,
-        });
+      const tl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power3.inOut" },
       });
 
-      return () => mm.revert();
+      tl.to([...actions, ...items], {
+        opacity: 0,
+        y: -10,
+        duration: 0.25,
+        stagger: 0.03,
+      })
+        .fromTo(
+          panel,
+          { height: "auto" },
+          {
+            height: 0,
+            duration: 0.45,
+            ease: "power3.inOut",
+          },
+          "-=0.1"
+        );
+
+      // Start in the closed state.
+      tl.progress(1);
+      menuTl.current = tl;
+
+      const top = lineTop.current;
+      const mid = lineMid.current;
+      const bottom = lineBottom.current;
+
+      if (top && mid && bottom) {
+        const icon = gsap.timeline({ paused: true });
+        icon
+          .to(top, { y: 7, rotate: 45, duration: 0.25, ease: "power2.inOut" }, 0)
+          .to(mid, { opacity: 0, duration: 0.15, ease: "power2.out" }, 0)
+          .to(bottom, { y: -7, rotate: -45, duration: 0.25, ease: "power2.inOut" }, 0);
+        iconTl.current = icon;
+      }
+
+      return () => {
+        tl.kill();
+        iconTl.current?.kill();
+        menuTl.current = null;
+        iconTl.current = null;
+      };
     },
-    { dependencies: [open], scope: headerRef }
+    { scope: headerRef }
   );
 
-  const closeMenu = () => {
-    if (!open) return;
+  const clearSettleTimer = useCallback(() => {
+    if (settleTimer.current !== null) {
+      window.clearTimeout(settleTimer.current);
+      settleTimer.current = null;
+    }
+  }, []);
+
+  const openMenu = useCallback(() => {
+    setOpen(true);
+    clearSettleTimer();
+    const tl = menuTl.current;
+    const icon = iconTl.current;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setOpen(false);
+      tl?.progress(0);
+      icon?.progress(1);
       return;
     }
-    const panel = panelRef.current;
-    if (!panel) {
-      setOpen(false);
+    tl?.reverse();
+    icon?.play();
+    settleTimer.current = window.setTimeout(() => {
+      if (tl && tl.progress() === 1) tl.progress(0);
+      if (icon && icon.progress() === 0) icon.progress(1);
+    }, 900);
+  }, [clearSettleTimer]);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    clearSettleTimer();
+    const tl = menuTl.current;
+    const icon = iconTl.current;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      tl?.progress(1);
+      icon?.progress(0);
       return;
     }
-
-    const fallback = window.setTimeout(() => setOpen(false), 420);
-
-    gsap.to(panel, {
-      height: 0,
-      opacity: 0,
-      duration: 0.3,
-      ease: "power3.inOut",
-      onComplete: () => {
-        window.clearTimeout(fallback);
-        setOpen(false);
-      },
-    });
-  };
+    tl?.play();
+    icon?.reverse();
+    settleTimer.current = window.setTimeout(() => {
+      if (tl && tl.progress() === 0) tl.progress(1);
+      if (icon && icon.progress() === 1) icon.progress(0);
+    }, 900);
+  }, [clearSettleTimer]);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setOpen(false);
+        closeMenu();
       }
     };
     document.addEventListener("keydown", onKey);
@@ -148,7 +163,7 @@ export default function SiteHeader() {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [open, closeMenu]);
 
   return (
     <>
@@ -168,10 +183,7 @@ export default function SiteHeader() {
               <PixelMark />
             </Link>
 
-            <span
-              ref={centerRef}
-              className="mono absolute left-1/2 -translate-x-1/2 text-[#f2f0e9]/60"
-            >
+            <span className="mono absolute left-1/2 -translate-x-1/2 text-[#f2f0e9]/60">
               Six perspectives
             </span>
 
@@ -181,97 +193,85 @@ export default function SiteHeader() {
               aria-expanded={open}
               aria-controls="site-menu"
               aria-label={open ? "Close navigation" : "Open navigation"}
-              onClick={() => (open ? closeMenu() : setOpen(true))}
+              onClick={() => (open ? closeMenu() : openMenu())}
             >
               <span className="relative block h-4 w-5" aria-hidden="true">
-                <span
-                  className={`absolute left-0 h-[2px] w-5 bg-[#f2f0e9] transition-transform duration-300 ${
-                    open ? "top-1/2 rotate-45" : "top-0"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-1/2 h-[2px] w-5 -translate-y-1/2 bg-[#f2f0e9] transition-opacity duration-300 ${
-                    open ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 h-[2px] w-5 bg-[#f2f0e9] transition-transform duration-300 ${
-                    open ? "top-1/2 -rotate-45" : "top-full"
-                  }`}
-                />
+                <span ref={lineTop} className="absolute left-0 top-0 h-[2px] w-5 bg-[#f2f0e9]" />
+                <span ref={lineMid} className="absolute left-0 top-[7px] h-[2px] w-5 bg-[#f2f0e9]" />
+                <span ref={lineBottom} className="absolute left-0 top-[14px] h-[2px] w-5 bg-[#f2f0e9]" />
               </span>
             </button>
           </div>
 
-          {open && (
-            <div
-              ref={panelRef}
-              id="site-menu"
-              className="max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]"
-            >
-              <nav aria-label="Primary">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    data-menu-item
-                    className="flex items-center justify-between border-b border-[#303030] px-6 py-5 text-[1.35rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323]"
-                    aria-current={isActive(item.href) ? "page" : undefined}
-                    onMouseEnter={(event) => {
-                      gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
-                        x: 6,
-                        duration: 0.3,
-                        ease: "power2.out",
-                      });
-                    }}
-                    onMouseLeave={(event) => {
-                      gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
-                        x: 0,
-                        duration: 0.3,
-                        ease: "power2.out",
-                      });
-                    }}
-                  >
-                    <span data-menu-label>{item.label}</span>
-                    {isActive(item.href) && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
-                    )}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="p-3">
+          <div
+            ref={panelRef}
+            id="site-menu"
+            style={{ height: 0 }}
+            inert={!open}
+            className="max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]"
+          >
+            <nav aria-label="Primary">
+              {menuItems.map((item) => (
                 <Link
-                  href="/approach"
-                  onClick={() => setOpen(false)}
-                  data-menu-action
-                  className="flex w-full items-center justify-center border border-[#4a4a4a] px-4 py-3 text-[0.68rem] uppercase tracking-[0.12em] text-[#f2f0e9]/80 transition-colors hover:border-[#f2f0e9] hover:text-[#f2f0e9]"
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMenu}
+                  data-menu-item
+                  className="flex items-center justify-between border-b border-[#303030] px-6 py-5 text-[1.35rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323]"
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  onMouseEnter={(event) => {
+                    gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
+                      x: 6,
+                      duration: 0.3,
+                      ease: "power2.out",
+                    });
+                  }}
+                  onMouseLeave={(event) => {
+                    gsap.to(event.currentTarget.querySelector("[data-menu-label]"), {
+                      x: 0,
+                      duration: 0.3,
+                      ease: "power2.out",
+                    });
+                  }}
                 >
-                  Our approach
+                  <span data-menu-label>{item.label}</span>
+                  {isActive(item.href) && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+                  )}
                 </Link>
+              ))}
+            </nav>
 
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <Link
-                    href="/work"
-                    onClick={() => setOpen(false)}
-                    data-menu-action
-                    className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
-                  >
-                    Explore our work
-                  </Link>
-                  <Link
-                    href="/contact"
-                    onClick={() => setOpen(false)}
-                    data-menu-action
-                    className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
-                  >
-                    Start a project
-                  </Link>
-                </div>
+            <div className="p-3">
+              <Link
+                href="/approach"
+                onClick={closeMenu}
+                data-menu-action
+                className="flex w-full items-center justify-center border border-[#4a4a4a] px-4 py-3 text-[0.68rem] uppercase tracking-[0.12em] text-[#f2f0e9]/80 transition-colors hover:border-[#f2f0e9] hover:text-[#f2f0e9]"
+              >
+                Our approach
+              </Link>
+
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <Link
+                  href="/work"
+                  onClick={closeMenu}
+                  data-menu-action
+                  className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                >
+                  Explore our work
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={closeMenu}
+                  data-menu-action
+                  className="flex items-center justify-center bg-[#f2f0e9] px-3 py-3 text-center text-[0.68rem] uppercase tracking-[0.08em] text-[#0a0a0a] transition-colors hover:bg-white"
+                >
+                  Start a project
+                </Link>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </header>
     </>
