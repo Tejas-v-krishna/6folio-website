@@ -5,8 +5,9 @@ import Marquee from "@/components/marquee";
 import Manifesto from "@/components/manifesto";
 import Accordion from "@/components/accordion";
 import StudioCard from "@/components/studio-card";
-import ProjectCard from "@/components/project-card";
-import { services, projects, questions, studioFacts } from "@/lib/content";
+import HorizontalWork from "@/components/horizontal-work";
+import Magnetic from "@/components/magnetic";
+import { services, questions, studioFacts } from "@/lib/content";
 
 const manifestoItems = services.map((service) => ({
   index: service.index,
@@ -46,12 +47,16 @@ export default function HomePage() {
                 people believe in.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link href="/contact" className="btn btn-primary">
-                  Build with us
-                </Link>
-                <Link href="/work" className="btn btn-secondary">
-                  Explore our work
-                </Link>
+                <Magnetic strength={0.25} className="inline-block">
+                  <Link href="/contact" className="btn btn-primary">
+                    Build with us
+                  </Link>
+                </Magnetic>
+                <Magnetic strength={0.25} className="inline-block">
+                  <Link href="/work" className="btn btn-secondary">
+                    Explore our work
+                  </Link>
+                </Magnetic>
               </div>
             </div>
 
@@ -105,30 +110,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-rule">
-        <div className="shell py-16 md:py-24">
-          <div className="border-b border-rule pb-6">
-            <SplitReveal as="h2" text="Our work" className="type-hero" />
-          </div>
-
-          <div className="mt-8 grid gap-10 md:grid-cols-12 md:gap-8">
-            <div className="md:col-span-6">
-              <ProjectCard project={projects[0]} aspect="aspect-[4/5]" compact />
-            </div>
-            <div className="md:col-span-6 md:mt-20">
-              <ProjectCard project={projects[1]} aspect="aspect-[4/5]" compact />
-            </div>
-            <div className="md:col-span-12 md:mt-4">
-              <ProjectCard
-                project={projects[2]}
-                aspect="aspect-[16/10] md:aspect-[2.15/1]"
-                compact
-              />
-            </div>
-          </div>
-
-        </div>
-      </section>
+      <HorizontalWork />
 
       <Manifesto items={manifestoItems} />
 

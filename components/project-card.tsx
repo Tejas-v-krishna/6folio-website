@@ -13,10 +13,12 @@ export default function ProjectCard({
   project,
   aspect = "aspect-[4/5] md:aspect-[4/3]",
   compact = false,
+  parallax = true,
 }: {
   project: Project;
   aspect?: string;
   compact?: boolean;
+  parallax?: boolean;
 }) {
   const dark = project.surface === "ink";
 
@@ -31,7 +33,19 @@ export default function ProjectCard({
           </div>
 
           <div className={`${aspect} w-full pt-12 md:pt-14`}>
-            <Parallax className="h-full w-full" amount={4} scale={1.05}>
+            {parallax ? (
+              <Parallax className="h-full w-full" amount={4} scale={1.05}>
+                <div className="project-art h-full w-full">
+                  <ProjectArtwork
+                    variant={project.artwork}
+                    scene={0}
+                    title={project.title}
+                    ariaLabel={`Abstract cover artwork for ${project.title}`}
+                    className="h-full w-full"
+                  />
+                </div>
+              </Parallax>
+            ) : (
               <div className="project-art h-full w-full">
                 <ProjectArtwork
                   variant={project.artwork}
@@ -41,7 +55,7 @@ export default function ProjectCard({
                   className="h-full w-full"
                 />
               </div>
-            </Parallax>
+            )}
           </div>
 
           <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-end p-4 md:p-6">

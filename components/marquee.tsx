@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap, useGSAP } from "@/components/gsap";
 
 export default function Marquee({
@@ -45,6 +45,59 @@ export default function Marquee({
     },
     { scope: trackRef }
   );
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let lastY = window.scrollY;
+    let lastTime = performance.now();
+    let settle: number | undefined;
+
+    const onScroll = () => {
+      const lenis = (window as unknown as { __lenis?: { velocity: number } }).__lenis;
+      const now = performance.now();
+      const dy = window.scrollY - lastY;
+      const dt = Math.max(1, now - lastTime);
+      const velocity = lenis ? lenis.velocity : dy / dt * 1000;
+      lastY = window.scrollY;
+      lastTime = now;
+
+      const skew = Math.max(-8, Math.min(8, -velocity * 0.012));
+      gsap.to(track, {
+        skewX: skew,
+        duration: 0.35,
+        ease: "power2.out",
+        force3D: true,
+      });
+
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        gsap.to(track, {
+          skewX: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+      }, 120);
+    };
+
+    const lenis = (window as unknown as { __lenis?: { on: (event: string, cb: () => void) => void; off?: (event: string, cb: () => void) => void } }).__lenis;
+    if (lenis) {
+      lenis.on("scroll", onScroll);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+
+    return () => {
+      if (lenis) {
+        lenis.off?.("scroll", onScroll);
+      } else {
+        window.removeEventListener("scroll", onScroll);
+      }
+      window.clearTimeout(settle);
+    };
+  }, [trackRef]);
 
   const row = [...items, ...items];
 

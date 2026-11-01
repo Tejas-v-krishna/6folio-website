@@ -224,6 +224,7 @@ export default function SiteHeader() {
             ref={panelRef}
             id="site-menu"
             inert={!open}
+            data-lenis-prevent
             className="h-0 max-h-[calc(100svh-5rem)] overflow-y-auto border-t border-[#3a3a3a]"
           >
             <nav aria-label="Primary">

@@ -97,7 +97,7 @@ export default function ApproachPage() {
               completed in 90 days.
             </p>
 
-            <div className="mt-10 overflow-x-auto">
+            <div className="mt-10 overflow-x-auto" data-lenis-prevent>
                 <table className="w-full min-w-[680px] text-left">
                   <thead>
                     <tr className="border-y border-rule">
