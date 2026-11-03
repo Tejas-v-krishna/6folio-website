@@ -7,10 +7,9 @@ import { gsap, useGSAP } from "@/components/gsap";
 
 const menuItems = [
   { label: "Work", href: "/work" },
-  { label: "What we do", href: "/services" },
-  { label: "How we work", href: "/approach" },
-  { label: "About us", href: "/about" },
-  { label: "Notes", href: "/notes" },
+  { label: "Services", href: "/services" },
+  { label: "Approach", href: "/approach" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -235,7 +234,11 @@ export default function SiteHeader() {
                   href={item.href}
                   onClick={closeMenu}
                   data-menu-item
-                  className="menu-row flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] text-[#f2f0e9] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem]"
+                  className={`menu-row flex items-center justify-between border-b border-[#303030] px-4 py-3 text-[1rem] font-medium tracking-[-0.02em] transition-colors hover:bg-[#232323] md:px-6 md:py-5 md:text-[1.35rem] ${
+                    isActive(item.href)
+                      ? "text-[#9AA2FF]"
+                      : "text-[#f2f0e9]"
+                  }`}
                   aria-current={isActive(item.href) ? "page" : undefined}
                 >
                   <span data-menu-label className="menu-label inline-block">

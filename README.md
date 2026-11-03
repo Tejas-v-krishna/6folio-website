@@ -41,20 +41,10 @@ The contact form validates enquiries on the client and server. It only reports s
 
 ## Routes
 
-- `/`
-- `/work`
-- `/work/serein-objects`
-- `/work/goodkind-coffee`
-- `/work/northstar-work`
-- `/services`
-- `/approach`
-- `/about`
-- `/contact`
-- `/privacy`
+- `/` (placeholder; sections to be built one by one)
 
 ## Content notes
 
-- All three portfolio projects are independent concept studies and are labelled as such in the interface.
+- Docs in `design.md`, `pages-ux-plan.md`, and `site-content.md` hold the approved direction and copy.
 - No client names, testimonials, performance results, awards, team names, or contact details are invented.
-- Team roles are shown without fabricated biographies or portraits.
-- See `BUILD_NOTES.md` for outstanding assets, decisions, and verification results.
+- See `BUILD_NOTES.md` for current status.

@@ -20,6 +20,7 @@
 
   --font-display: var(--font-sans);
   --font-sans: var(--font-sans);
+  --font-editorial: var(--font-editorial);
 
   --radius-none: 0px;
   --radius-xs: 2px;
@@ -434,6 +435,38 @@
   .marquee {
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  .marquee-band {
+    overflow: hidden;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    transform: rotate(-2.5deg) scale(1.03);
+    border-top: 1px solid var(--color-ink);
+    border-bottom: 1px solid var(--color-ink);
+  }
+
+  .marquee-band-track {
+    display: inline-flex;
+    white-space: nowrap;
+    width: max-content;
+    animation: folio-marquee 28s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-band-chunk {
+    font-family: var(--font-display), "Helvetica Neue", Arial, sans-serif;
+    font-size: clamp(1.8rem, 4.5vw, 3.6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    padding: 1.1rem 0;
+  }
+
+  @keyframes folio-marquee {
+    to {
+      transform: translateX(-50%);
+    }
   }
 
   .marquee-track {
