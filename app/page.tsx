@@ -1,11 +1,25 @@
+import { HeroSection } from "@/components/hero/hero-section";
+
 export default function HomePage() {
   return (
-    <div className="shell py-16 md:py-24">
-      <p className="mono">Fresh start</p>
-      <h1 className="type-hero mt-4 max-w-4xl">Clean slate, navbar kept.</h1>
-      <p className="type-body-lg mt-6 max-w-2xl text-muted">
-        All sections are stripped. Tell me which section to build first.
-      </p>
-    </div>
+      <main>
+        <HeroSection />
+
+      <section id="approach" className="below-fold" aria-label="How 6FOLIO works">
+        <div className="below-inner">
+          <h2 className="below-lead">
+            Six disciplines. One connected process.{" "}
+            <span className="muted-lead">
+              Every decision serves the same objective, from first brief to final
+              delivery.
+            </span>
+          </h2>
+          <p className="below-note">
+            Next section: selected work and the enquiry path are designed after
+            the hero is signed off.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }

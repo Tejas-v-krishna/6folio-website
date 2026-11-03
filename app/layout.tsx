@@ -1,30 +1,35 @@
 import type { Metadata } from "next";
-import { Inter_Tight } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import SiteHeader from "@/components/site-header";
 
-const sans = Inter_Tight({
+const sans = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600"],
   variable: "--font-sans",
+  fallback: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+  display: "swap",
+});
+
+const editorial = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-editorial",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "6FOLIO",
-  description: "6FOLIO is an independent creative growth studio.",
+  title: "6FOLIO | Six perspectives. One clear direction.",
+  description:
+    "6FOLIO is an independent creative growth studio. Six disciplines bound into one connected direction for ambitious businesses, from first idea to complete brand experience.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={sans.variable}>
-      <body>
-        <SiteHeader />
-        <div className="h-[4.75rem] md:h-[5.5rem]" aria-hidden="true" />
-        <main>{children}</main>
-      </body>
+    <html lang="en" className={`${sans.variable} ${editorial.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
