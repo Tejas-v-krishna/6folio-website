@@ -16,9 +16,12 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  transform-origin: 55% 45%;
+  animation: engraving-breath 6s ease-in-out infinite;
 }
 
 .engravingImage,
+.baseDither,
 .dither {
   position: absolute;
   inset: 0;
@@ -34,8 +37,24 @@
   user-select: none;
 }
 
+.baseDither,
 .dither {
   pointer-events: none;
+}
+
+.dither {
+  z-index: 1;
+}
+
+@keyframes engraving-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.004);
+  }
 }
 
 .stageTop {
@@ -405,6 +424,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .portrait {
+    animation: none;
+  }
+
   .verticalNav::before,
   .verticalNav a,
   .cta,

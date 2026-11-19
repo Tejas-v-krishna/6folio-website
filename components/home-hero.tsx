@@ -62,15 +62,18 @@ function distanceToSegment(
 export default function HomeHero() {
   const portraitRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const portrait = portraitRef.current;
     const image = imageRef.current;
+    const baseCanvas = baseCanvasRef.current;
     const canvas = canvasRef.current;
+    const baseContext = baseCanvas?.getContext("2d") ?? null;
     const context = canvas?.getContext("2d") ?? null;
 
-    if (!portrait || !image || !canvas || !context) return;
+    if (!portrait || !image || !baseCanvas || !baseContext || !canvas || !context) return;
 
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     // Keep the engraving static while the preloader is up. It starts once the
@@ -83,7 +86,8 @@ export default function HomeHero() {
     let visible = true;
     let width = 0;
     let height = 0;
-    let dots: Dot[] = [];
+    let baseDots: Dot[] = [];
+    let eyeDots: Dot[] = [];
     let phase = 0;
     let pivotX = 0;
     let pivotY = 0;
@@ -295,8 +299,7 @@ export default function HomeHero() {
     const draw = () => {
       if (width === 0 || height === 0) return;
 
-      context.fillStyle = PAPER;
-      context.fillRect(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
       context.fillStyle = INK;
 
       const wave = reduced ? 0 : (phase / LOOP_SECONDS) * Math.PI * 2;
@@ -315,23 +318,22 @@ export default function HomeHero() {
       const eyeShiftY = eyeShiftX * 0.14;
       const lensHoleRadius = lensRing * 1.04;
 
-      for (const dot of dots) {
-        if (
-          Math.hypot(dot.x - lensCenterX, dot.y - lensCenterY) <
-          lensHoleRadius
-        ) {
-          continue;
-        }
-
+      for (const dot of eyeDots) {
         const x = dot.x + eyeShiftX * dot.eyeWeight;
         const y = dot.y + eyeShiftY * dot.eyeWeight;
-        const pulse = 0.78 + 0.22 * Math.sin(wave - dot.phase);
+        const pulse = 0.9 + 0.1 * Math.sin(wave - dot.phase);
         const size = Math.min(dot.size * pulse, dot.maxSize);
 
         if (size < 0.45) continue;
 
         context.fillRect(x - size / 2, y - size / 2, size, size);
       }
+
+      context.fillStyle = PAPER;
+      context.beginPath();
+      context.arc(lensCenterX, lensCenterY, lensHoleRadius, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = INK;
 
       buildPendantDensity(chainAngle, lensCenterX, lensCenterY, wave);
 
@@ -377,7 +379,7 @@ export default function HomeHero() {
 
       if (lastPaint === 0) lastPaint = timestamp;
 
-      if (timestamp - lastPaint < 32) {
+      if (timestamp - lastPaint < 50) {
         frame = requestAnimationFrame(tick);
         return;
       }
@@ -404,16 +406,21 @@ export default function HomeHero() {
       const rect = portrait.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       width = rect.width;
       height = rect.height;
-      canvas.width = Math.max(1, Math.round(width * dpr));
-      canvas.height = Math.max(1, Math.round(height * dpr));
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+
+      for (const target of [baseCanvas, canvas]) {
+        target.width = Math.max(1, Math.round(width * dpr));
+        target.height = Math.max(1, Math.round(height * dpr));
+        target.style.width = `${width}px`;
+        target.style.height = `${height}px`;
+      }
+
+      baseContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const cell = Math.max(3, Math.round(width / 280));
+      const cell = Math.max(3, Math.round(width / 220));
       const cols = Math.ceil(width / cell);
       const rows = Math.ceil(height / cell);
 
@@ -489,7 +496,8 @@ export default function HomeHero() {
         ry: eye.ry * naturalHeight,
       }));
 
-      dots = [];
+      baseDots = [];
+      eyeDots = [];
 
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
@@ -543,20 +551,42 @@ export default function HomeHero() {
             dotX - baseLensX,
             dotY - baseLensY,
           );
-
-          dots.push({
+          const dot: Dot = {
             x: dotX,
             y: dotY,
             size: Math.pow(density, 0.6) * cell * 0.96,
             maxSize: cell,
             phase: lensDistance * 0.03,
             eyeWeight,
-          });
+          };
+
+          if (eyeWeight > 0.02) {
+            eyeDots.push(dot);
+          } else {
+            baseDots.push(dot);
+          }
         }
+      }
+
+      baseContext.clearRect(0, 0, width, height);
+      baseContext.fillStyle = INK;
+
+      for (const dot of baseDots) {
+        const size = Math.min(dot.size * 0.94, dot.maxSize);
+
+        if (size < 0.45) continue;
+
+        baseContext.fillRect(
+          dot.x - size / 2,
+          dot.y - size / 2,
+          size,
+          size,
+        );
       }
 
       phase = 0;
       draw();
+      image.style.opacity = "0";
       start();
     };
 
@@ -667,6 +697,11 @@ export default function HomeHero() {
             decoding="async"
             className={styles.engravingImage}
             draggable={false}
+          />
+          <canvas
+            ref={baseCanvasRef}
+            aria-hidden="true"
+            className={styles.baseDither}
           />
           <canvas ref={canvasRef} aria-hidden="true" className={styles.dither} />
         </div>

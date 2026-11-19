@@ -83,23 +83,6 @@ export default function AsciiPreloader() {
     const panel = textRef.current;
     const simplex = createNoise3D();
     let raf = 0;
-    let time = 0;
-    let stopped = false;
-    let lastDraw = 0;
-    const revealStart = performance.now();
-
-    const resize = () => {
-      if (!canvas) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    window.addEventListener("resize", resize);
-    resize();
 
     const bayer = [
       [0, 8, 2, 10],
@@ -108,40 +91,22 @@ export default function AsciiPreloader() {
       [15, 7, 13, 5],
     ];
 
-    const draw = (timestamp: number) => {
-      if (!canvas || !ctx || stopped) return;
-
-      if (timestamp - lastDraw < 32) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
-
-      lastDraw = timestamp;
-      time += 0.008;
+    const renderField = () => {
+      if (!canvas || !ctx) return;
 
       const width = window.innerWidth;
       const height = window.innerHeight;
 
-      // Start on a clean blue field, then ease the white 6/F grid in.
-      const revealProgress = Math.min(
-        1,
-        (performance.now() - revealStart) / 1200,
-      );
-      const revealEase =
-        revealProgress * revealProgress * (3 - 2 * revealProgress);
-
       ctx.globalAlpha = 1;
       ctx.fillStyle = THEME_BLUE;
       ctx.fillRect(0, 0, width, height);
-
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.globalAlpha = revealEase;
 
       for (let y = 0; y < height; y += CELL_SIZE) {
         for (let x = 0; x < width; x += CELL_SIZE) {
-          const noiseValue = simplex(x * 0.0025, y * 0.0025, time);
+          const noiseValue = simplex(x * 0.0025, y * 0.0025, 2.2);
 
           const gridX = Math.floor(x / CELL_SIZE);
           const gridY = Math.floor(y / CELL_SIZE);
@@ -159,11 +124,22 @@ export default function AsciiPreloader() {
           );
         }
       }
-
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(draw);
     };
-    raf = requestAnimationFrame(draw);
+
+    const resize = () => {
+      if (!canvas) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
+      renderField();
+    };
+
+    window.addEventListener("resize", resize);
+    resize();
 
     const textLines = textRef.current?.querySelectorAll(".stagger-element");
     if (textLines) {
@@ -178,7 +154,6 @@ export default function AsciiPreloader() {
     }
 
     const exitTimer = window.setTimeout(() => {
-      stopped = true;
       setPhase("exit");
 
       if (!canvas || !ctx) return;
@@ -259,7 +234,6 @@ export default function AsciiPreloader() {
     }, LOAD_MS + EXIT_MS + 60);
 
     return () => {
-      stopped = true;
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
       window.clearTimeout(exitTimer);
