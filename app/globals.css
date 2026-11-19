@@ -809,6 +809,10 @@
   animation: preloader-field-in 1.2s ease both;
 }
 
+.preloaded .ascii-preloader {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

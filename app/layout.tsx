@@ -66,8 +66,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${script.variable}`}>
+    <html
+      lang="en"
+      className={`${sans.variable} ${script.variable}`}
+      suppressHydrationWarning
+    >
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(sessionStorage.getItem("6folio:preloaded")==="1"){document.documentElement.classList.add("preloaded")}}catch(e){}',
+          }}
+        />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

@@ -71,7 +71,22 @@ export default function AsciiPreloader() {
   const textRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let alreadyShown = false;
+
+    try {
+      alreadyShown = sessionStorage.getItem("6folio:preloaded") === "1";
+    } catch {
+      alreadyShown = false;
+    }
+
+    if (alreadyShown) {
+      document.documentElement.classList.add("preloaded");
+    }
+
+    if (reduced || alreadyShown) {
       window.dispatchEvent(new Event("6folio:revealed"));
       return;
     }
@@ -229,6 +244,12 @@ export default function AsciiPreloader() {
     }, LOAD_MS);
 
     const doneTimer = window.setTimeout(() => {
+      try {
+        sessionStorage.setItem("6folio:preloaded", "1");
+      } catch {
+        // Session storage can be unavailable in strict browser modes.
+      }
+
       setPhase("done");
       window.dispatchEvent(new Event("6folio:revealed"));
     }, LOAD_MS + EXIT_MS + 60);

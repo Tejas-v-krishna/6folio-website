@@ -80,8 +80,12 @@ export default function HomeHero() {
     // page is revealed, which avoids running a second full-screen animation
     // during loading.
     const preloader = document.querySelector(".ascii-preloader");
+    const preloaderSkipped = document.documentElement.classList.contains(
+      "preloaded",
+    );
+    const preloaderActive = Boolean(preloader) && !preloaderSkipped;
     let reduced = motionQuery.matches;
-    let revealed = !preloader || reduced;
+    let revealed = !preloaderActive || reduced;
     let revealFallback = 0;
     let visible = true;
     let width = 0;
@@ -627,7 +631,7 @@ export default function HomeHero() {
       start();
     };
 
-    if (preloader) {
+    if (preloaderActive) {
       window.addEventListener("6folio:revealed", onRevealed, { once: true });
       revealFallback = window.setTimeout(onRevealed, 8000);
     }

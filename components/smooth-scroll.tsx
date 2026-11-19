@@ -77,8 +77,11 @@ export default function SmoothScroll() {
     };
 
     const preloader = document.querySelector(".ascii-preloader");
+    const preloaderSkipped = document.documentElement.classList.contains(
+      "preloaded",
+    );
 
-    if (preloader) {
+    if (preloader && !preloaderSkipped) {
       window.addEventListener("6folio:revealed", onReveal, { once: true });
     } else {
       init();
