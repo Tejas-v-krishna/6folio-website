@@ -1,13 +1,13 @@
 "use client";
 
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { createNoise3D } from "simplex-noise";
 import { ToggleMark } from "@/components/marks";
 
 const THEME_BLUE = "#1636f8";
 const CELL_SIZE = 14;
-const LOAD_MS = 3600;
+const LOAD_MS = 2200;
 const EXIT_MS = 900;
 
 const lines = ["Six perspectives.", "One clear direction."];
@@ -67,11 +67,8 @@ function getChar(x: number, y: number) {
 
 export default function AsciiPreloader() {
   const [phase, setPhase] = useState<"load" | "exit" | "done">("load");
-  const [snapshot, setSnapshot] = useState<string | null>(null);
-  const [tiles, setTiles] = useState<DissolveTile[]>([]);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
-  const tilesRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -83,10 +80,12 @@ export default function AsciiPreloader() {
 
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d") ?? null;
+    const panel = textRef.current;
     const simplex = createNoise3D();
     let raf = 0;
     let time = 0;
     let stopped = false;
+    let lastDraw = 0;
     const revealStart = performance.now();
 
     const resize = () => {
@@ -109,9 +108,16 @@ export default function AsciiPreloader() {
       [15, 7, 13, 5],
     ];
 
-    const draw = () => {
+    const draw = (timestamp: number) => {
       if (!canvas || !ctx || stopped) return;
-      time += 0.004;
+
+      if (timestamp - lastDraw < 32) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
+
+      lastDraw = timestamp;
+      time += 0.008;
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -157,7 +163,7 @@ export default function AsciiPreloader() {
       ctx.globalAlpha = 1;
       raf = requestAnimationFrame(draw);
     };
-    draw();
+    raf = requestAnimationFrame(draw);
 
     const textLines = textRef.current?.querySelectorAll(".stagger-element");
     if (textLines) {
@@ -173,14 +179,78 @@ export default function AsciiPreloader() {
 
     const exitTimer = window.setTimeout(() => {
       stopped = true;
-      const snapshotUrl = canvas ? canvas.toDataURL("image/png") : null;
-
-      if (snapshotUrl) {
-        setSnapshot(snapshotUrl);
-        setTiles(createDissolveTiles(window.innerWidth, window.innerHeight));
-      }
-
       setPhase("exit");
+
+      if (!canvas || !ctx) return;
+
+      cancelAnimationFrame(raf);
+
+      const dpr = canvas.width / Math.max(1, window.innerWidth);
+      const tiles = createDissolveTiles(
+        window.innerWidth,
+        window.innerHeight,
+      );
+      const snapshot = document.createElement("canvas");
+      snapshot.width = canvas.width;
+      snapshot.height = canvas.height;
+      snapshot.getContext("2d")?.drawImage(canvas, 0, 0);
+
+      const started = performance.now();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const animateExit = (now: number) => {
+        if (!ctx) return;
+
+        const elapsed = (now - started) / 1000;
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+
+        ctx.clearRect(0, 0, viewWidth, viewHeight);
+        let visible = 0;
+
+        for (const tile of tiles) {
+          const progress = Math.min(
+            1,
+            Math.max(0, (elapsed - tile.delay) / tile.duration),
+          );
+          const opacity = 1 - progress;
+
+          if (opacity <= 0) continue;
+
+          visible += 1;
+          ctx.globalAlpha = opacity;
+          ctx.drawImage(
+            snapshot,
+            tile.left * dpr,
+            tile.top * dpr,
+            tile.width * dpr,
+            tile.height * dpr,
+            tile.left,
+            tile.top,
+            tile.width,
+            tile.height,
+          );
+        }
+
+        ctx.globalAlpha = 1;
+
+        if (visible > 0) {
+          raf = requestAnimationFrame(animateExit);
+        }
+      };
+
+      raf = requestAnimationFrame(animateExit);
+
+      if (panel) {
+        gsap.to(panel, {
+          opacity: 0,
+          duration: 0.45,
+          delay: 0.08,
+          ease: "power2.inOut",
+        });
+      }
     }, LOAD_MS);
 
     const doneTimer = window.setTimeout(() => {
@@ -194,36 +264,10 @@ export default function AsciiPreloader() {
       cancelAnimationFrame(raf);
       window.clearTimeout(exitTimer);
       window.clearTimeout(doneTimer);
+      if (panel) gsap.killTweensOf(panel);
       document.body.style.overflow = "";
     };
   }, []);
-
-  useEffect(() => {
-    if (phase !== "exit" || !snapshot) return;
-
-    const container = tilesRef.current;
-    if (!container) return;
-
-    const nodes = Array.from(
-      container.querySelectorAll<HTMLElement>(".preloader-dissolve-tile"),
-    );
-
-    nodes.forEach((node, index) => {
-      const tile = tiles[index];
-      if (!tile) return;
-
-      gsap.to(node, {
-        opacity: 0,
-        duration: tile.duration,
-        delay: tile.delay,
-        ease: "power2.inOut",
-      });
-    });
-
-    return () => {
-      gsap.killTweensOf(nodes);
-    };
-  }, [phase, snapshot, tiles]);
 
   useEffect(() => {
     if (phase === "done") {
@@ -232,8 +276,6 @@ export default function AsciiPreloader() {
   }, [phase]);
 
   if (phase === "done") return null;
-
-  const liveOpacity = phase === "load" ? 1 : 0;
 
   return (
     <div
@@ -247,13 +289,11 @@ export default function AsciiPreloader() {
         ref={canvasRef}
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
-        style={{ opacity: liveOpacity }}
       />
 
       <div
         ref={textRef}
         className="relative z-10 flex aspect-square w-[min(86vw,70svh,520px)] flex-col items-center justify-center bg-[#1636f8] px-6 py-8 text-center text-white md:px-10"
-        style={{ opacity: liveOpacity }}
       >
         <div className="stagger-element mb-8 opacity-0">
           <ToggleMark className="h-12 w-24 text-white" />
@@ -269,61 +309,6 @@ export default function AsciiPreloader() {
           ))}
         </div>
       </div>
-
-      {phase === "exit" && snapshot ? (
-        <div
-          ref={tilesRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20"
-          style={
-            {
-              "--preloader-snapshot": `url(${snapshot})`,
-            } as CSSProperties
-          }
-        >
-          {tiles.map((tile) => (
-            <div
-              key={tile.id}
-              className="preloader-dissolve-tile absolute overflow-hidden"
-              style={{
-                left: tile.left,
-                top: tile.top,
-                width: tile.width,
-                height: tile.height,
-                willChange: "opacity",
-              }}
-            >
-              <div
-                className="absolute left-0 top-0"
-                style={{
-                  width: "100vw",
-                  height: "100vh",
-                  transform: `translate(-${tile.left}px, -${tile.top}px)`,
-                  backgroundImage: "var(--preloader-snapshot)",
-                  backgroundSize: "100vw 100vh",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative flex aspect-square w-[min(86vw,70svh,520px)] flex-col items-center justify-center bg-[#1636f8] px-6 py-8 text-center text-white md:px-10">
-                    <div className="mb-8">
-                      <ToggleMark className="h-12 w-24 text-white" />
-                    </div>
-
-                    <div className="text-[22px] font-medium leading-[1.4] tracking-[-0.01em] md:text-[32px]">
-                      {lines.map((line) => (
-                        <div key={line} className="pb-[2px]">
-                          {line}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }

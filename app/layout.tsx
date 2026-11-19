@@ -23,6 +23,9 @@ const script = Caveat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+    : undefined,
   title: {
     default: "6FOLIO | Six perspectives. One clear direction.",
     template: "%s | 6FOLIO",
@@ -36,12 +39,21 @@ export const metadata: Metadata = {
       "An independent creative growth studio bringing six perspectives to one clear direction.",
     type: "website",
     siteName: "6FOLIO",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "6FOLIO engraved portrait hero with the line six perspectives, one clear direction.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "6FOLIO | Six perspectives. One clear direction.",
     description:
       "An independent creative growth studio bringing six perspectives to one clear direction.",
+    images: ["/og-image.jpg"],
   },
 };
 

@@ -18,7 +18,7 @@ export default function ApproachPage() {
         description="A strong result starts before the first design or campaign goes live. We use a shared process to keep the business goal, creative decisions, and delivery connected."
         tone="ink"
       >
-        <p className="mt-6 max-w-sm border-t border-white/20 pt-4 text-[0.66rem] font-semibold uppercase leading-5 tracking-[0.09em] text-white/60">
+        <p className="mt-6 max-w-sm border-t border-white/20 pt-4 text-[0.66rem] font-semibold uppercase leading-5 tracking-[0.09em] text-white/85">
           Not every project needs all six stages. We shape the process around
           the brief.
         </p>
@@ -35,7 +35,7 @@ export default function ApproachPage() {
                 Stay connected.
               </h2>
             </div>
-            <p className="max-w-md text-sm leading-6 text-white/60 lg:col-span-4">
+            <p className="max-w-md text-sm leading-6 text-white/85 lg:col-span-4">
               The work changes from project to project. The standard does not.
               We make the objective visible, give each discipline room, and
               bring the decisions back together.
@@ -50,14 +50,14 @@ export default function ApproachPage() {
               >
                 <p className="flex items-baseline gap-2 text-[0.7rem] font-semibold tracking-[0.08em] text-white md:col-span-1">
                   {step.number}
-                  <span className="text-[0.65rem] font-normal text-white/35">
+                  <span className="text-[0.65rem] font-normal text-white/80">
                     of 06
                   </span>
                 </p>
                 <h2 className="text-[clamp(1.6rem,3vw,2.7rem)] font-medium leading-none tracking-[-0.05em] md:col-span-4">
                   {step.title}
                 </h2>
-                <p className="max-w-2xl text-sm leading-6 text-white/60 md:col-span-6 md:col-start-6">
+                <p className="max-w-2xl text-sm leading-6 text-white/85 md:col-span-6 md:col-start-6">
                   {step.body}
                 </p>
               </div>
@@ -65,7 +65,7 @@ export default function ApproachPage() {
           </div>
 
           <div className="relative mt-8 border-t border-white/20 pt-6">
-            <p className="max-w-xl text-sm leading-6 text-white/45">
+            <p className="max-w-xl text-sm leading-6 text-white/85">
               We would rather make the brief clearer than make the scope
               bigger. Every part of the work should have a reason to be there.
             </p>

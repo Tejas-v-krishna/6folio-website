@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { contactEndpoint, postForm } from "@/lib/forms";
 
 const needs = [
   "Brand direction",
@@ -13,9 +14,11 @@ const needs = [
 ];
 
 export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "prototype">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error" | "unconfigured"
+  >("idle");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
 
@@ -24,11 +27,28 @@ export default function ContactForm() {
       return;
     }
 
-    setStatus("prototype");
+    if (!contactEndpoint) {
+      setStatus("unconfigured");
+      return;
+    }
+
+    setStatus("submitting");
+
+    try {
+      await postForm(contactEndpoint, form);
+      form.reset();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      aria-busy={status === "submitting"}
+    >
       <div className="grid gap-8 md:grid-cols-2">
         <div>
           <label className="form-label" htmlFor="name">
@@ -105,14 +125,17 @@ export default function ContactForm() {
 
       <div className="mt-10 flex flex-col gap-5 border-t border-rule pt-6 sm:flex-row sm:items-start sm:justify-between">
         <p className="max-w-md text-[0.72rem] leading-5 text-muted">
-          This form is a prototype. It is not connected to an enquiry inbox, so
-          submissions are not delivered. Do not include confidential
-          information. A direct contact channel will be published once it is
-          confirmed.
+          {contactEndpoint
+            ? "This form sends your details to the studio's form provider. Do not include confidential information."
+            : "This form is not connected to an enquiry inbox yet, so submissions are not delivered. Do not include confidential information. A direct contact channel will be published once it is confirmed."}
         </p>
 
-        <button type="submit" className="btn-pill shrink-0">
-          Send project enquiry
+        <button
+          type="submit"
+          disabled={status === "submitting"}
+          className="btn-pill shrink-0 disabled:cursor-wait disabled:opacity-70"
+        >
+          {status === "submitting" ? "Sending..." : "Send project enquiry"}
           <span className="btn-dot" aria-hidden="true" />
         </button>
       </div>
@@ -122,11 +145,18 @@ export default function ContactForm() {
         aria-live="polite"
         className="mt-5 min-h-[1.5rem] text-sm leading-6 text-ink"
       >
-        {status === "prototype" ? (
+        {status === "unconfigured" ? (
           <p>
             This form is not connected yet. Nothing has been sent. The studio
             will need to connect a form endpoint before enquiries can be
             received here.
+          </p>
+        ) : null}
+        {status === "success" ? <p>Thank you. Your enquiry has been sent.</p> : null}
+        {status === "error" ? (
+          <p>
+            Something went wrong, so your enquiry was not sent. Please try
+            again.
           </p>
         ) : null}
       </div>

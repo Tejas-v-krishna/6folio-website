@@ -97,7 +97,7 @@ export default function ContactPage() {
             <div className="lg:col-span-5 lg:col-start-8">
               <ol className="grid gap-5">
                 <li className="border-t border-ink/15 pt-4">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/50">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/70">
                     01
                   </p>
                   <p className="mt-2 text-sm leading-6 text-ink/70">
@@ -106,7 +106,7 @@ export default function ContactPage() {
                   </p>
                 </li>
                 <li className="border-t border-ink/15 pt-4">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/50">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/70">
                     02
                   </p>
                   <p className="mt-2 text-sm leading-6 text-ink/70">
@@ -115,7 +115,7 @@ export default function ContactPage() {
                   </p>
                 </li>
                 <li className="border-t border-ink/15 pt-4">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/50">
+                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.09em] text-ink/70">
                     03
                   </p>
                   <p className="mt-2 text-sm leading-6 text-ink/70">

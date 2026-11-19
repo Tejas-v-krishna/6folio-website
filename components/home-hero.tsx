@@ -662,6 +662,9 @@ export default function HomeHero() {
             alt=""
             width={900}
             height={900}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className={styles.engravingImage}
             draggable={false}
           />

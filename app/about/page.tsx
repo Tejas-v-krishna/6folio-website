@@ -92,7 +92,7 @@ export default function AboutPage() {
                   <h3 className="text-[clamp(1.45rem,2.4vw,2.15rem)] font-medium tracking-[-0.05em] text-white">
                     {role.perspective}
                   </h3>
-                  <p className="mt-1 text-[0.67rem] font-semibold uppercase tracking-[0.08em] text-white/60">
+                  <p className="mt-1 text-[0.67rem] font-semibold uppercase tracking-[0.08em] text-white/85">
                     {role.role}
                   </p>
                 </div>
@@ -153,7 +153,7 @@ export default function AboutPage() {
               </h2>
             </div>
             <div className="lg:col-span-3 lg:text-right">
-              <p className="text-sm leading-6 text-white/60">
+              <p className="text-sm leading-6 text-white/85">
                 One connected team, one shared brief, and a clear point of
                 contact.
               </p>

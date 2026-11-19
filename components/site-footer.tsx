@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import FooterDither from "@/components/footer-dither";
 import { SixFBoxes } from "@/components/six-f";
+import { newsletterEndpoint, postForm } from "@/lib/forms";
 
 const navigationLinks = [
   { href: "/work", label: "Work" },
@@ -94,12 +95,39 @@ function SocialTiles() {
 }
 
 export default function SiteFooter() {
-  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "unsupported">(
-    "idle",
-  );
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    "idle" | "submitting" | "success" | "error" | "unconfigured"
+  >("idle");
+
+  async function handleNewsletterSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (!newsletterEndpoint) {
+      setNewsletterStatus("unconfigured");
+      return;
+    }
+
+    setNewsletterStatus("submitting");
+
+    try {
+      await postForm(newsletterEndpoint, form);
+      form.reset();
+      setNewsletterStatus("success");
+    } catch {
+      setNewsletterStatus("error");
+    }
+  }
 
   return (
-    <footer className="relative overflow-hidden bg-footer pt-16 md:pt-24">
+    <footer className="relative overflow-hidden bg-footer pb-16 pt-16 md:pb-24 md:pt-24">
       <div className="relative z-10 mx-auto w-[calc(100%-1.25rem)] md:w-[calc(100%-2rem)] lg:w-[min(calc(100%-10rem),1120px)]">
         <div className="grid gap-4 lg:grid-cols-[0.34fr_0.66fr] lg:gap-5">
           <div className="relative flex min-h-[420px] flex-col overflow-hidden rounded-[22px] bg-[linear-gradient(160deg,#06145f_0%,#0e2db5_48%,#2f6bff_100%)] p-6 text-white shadow-[0_30px_70px_rgba(7,22,120,0.28)] md:min-h-[520px] md:p-8">
@@ -194,7 +222,7 @@ export default function SiteFooter() {
                 <p className="text-[11px] leading-5 text-footer-muted">
                   © 2026 6FOLIO. All rights reserved.
                 </p>
-                <p className="mt-1 max-w-[230px] text-[10px] leading-4 text-footer-muted/80">
+                <p className="mt-1 max-w-[230px] text-[10px] leading-4 text-[#5f5f66]">
                   All projects shown are self-initiated concept studies.
                 </p>
               </div>
@@ -209,10 +237,8 @@ export default function SiteFooter() {
 
                 <form
                   className="mt-3"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    setNewsletterStatus("unsupported");
-                  }}
+                  onSubmit={handleNewsletterSubmit}
+                  aria-busy={newsletterStatus === "submitting"}
                 >
                   <label htmlFor="footer-email" className="sr-only">
                     Email address
@@ -230,9 +256,12 @@ export default function SiteFooter() {
                     />
                     <button
                       type="submit"
-                      className="h-9 shrink-0 rounded-[8px] bg-[#0a0a0f] px-4 text-[12px] font-medium text-white transition-colors hover:bg-accent"
+                      disabled={newsletterStatus === "submitting"}
+                      className="h-9 shrink-0 rounded-[8px] bg-[#0a0a0f] px-4 text-[12px] font-medium text-white transition-colors hover:bg-accent disabled:cursor-wait disabled:opacity-70"
                     >
-                      Subscribe
+                      {newsletterStatus === "submitting"
+                        ? "Sending..."
+                        : "Subscribe"}
                     </button>
                   </div>
 
@@ -241,24 +270,21 @@ export default function SiteFooter() {
                     aria-live="polite"
                     className="mt-2 min-h-[32px] text-[11px] leading-4 text-footer-muted"
                   >
-                    {newsletterStatus === "unsupported"
+                    {newsletterStatus === "unconfigured"
                       ? "Newsletter delivery is not connected yet. No address was stored."
-                      : ""}
+                      : null}
+                    {newsletterStatus === "success"
+                      ? "Thanks. Your signup was received."
+                      : null}
+                    {newsletterStatus === "error"
+                      ? "That did not go through. Please try again."
+                      : null}
                   </p>
                 </form>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="relative mt-2 h-[clamp(110px,19vw,240px)] overflow-hidden">
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 select-none whitespace-nowrap text-[clamp(8rem,36vw,30rem)] font-bold leading-[0.7] tracking-[-0.08em] text-footer-watermark"
-        >
-          6folio
-        </span>
       </div>
     </footer>
   );

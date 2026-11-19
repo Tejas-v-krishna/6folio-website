@@ -150,18 +150,18 @@ export default function HomePage() {
 
                   <div className="rounded-[12px] bg-[#06133d] px-4 py-3.5 font-mono text-[10.5px] leading-[1.7] text-[#a9c6ff] shadow-[0_12px_30px_rgba(2,9,35,0.25)]">
                     <p className="whitespace-nowrap">
-                      <span className="text-white/45">01</span> listen{" "}
+                      <span className="text-white/70">01</span> listen{" "}
                       <span className="text-white/25">·</span>{" "}
-                      <span className="text-white/45">02</span> focus{" "}
+                      <span className="text-white/70">02</span> focus{" "}
                       <span className="text-white/25">·</span>{" "}
-                      <span className="text-white/45">03</span> shape
+                      <span className="text-white/70">03</span> shape
                     </p>
                     <p className="whitespace-nowrap">
-                      <span className="text-white/45">04</span> make{" "}
+                      <span className="text-white/70">04</span> make{" "}
                       <span className="text-white/25">·</span>{" "}
-                      <span className="text-white/45">05</span> launch{" "}
+                      <span className="text-white/70">05</span> launch{" "}
                       <span className="text-white/25">·</span>{" "}
-                      <span className="text-white/45">06</span> learn
+                      <span className="text-white/70">06</span> learn
                     </p>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ export default function HomePage() {
                 <h3 className="mt-5 text-[1.65rem] font-semibold tracking-[-0.04em]">
                   One clear requirement.
                 </h3>
-                <p className="mt-3 max-w-md text-sm leading-6 text-white/65">
+                <p className="mt-3 max-w-md text-sm leading-6 text-white/85">
                   A brand refresh, a campaign idea, a website, a shoot, or a
                   growth plan. We bring the right disciplines around one focused
                   outcome.
