@@ -7,7 +7,11 @@ import styles from "./home-hero.module.css";
 
 const PAPER = "#f0ead9";
 const INK = "#2834b8";
-const LOOP_SECONDS = 6;
+const FRAME_MS = 1000 / 20;
+const GRAVITY = Math.pow((2 * Math.PI) / 3.8, 2);
+const SWING = 0.17;
+const MAX_SPEED = Math.sqrt(2 * GRAVITY * (1 - Math.cos(SWING)));
+const MAX_IRIS_CELLS = 2;
 
 const PIVOT = { x: 0.65, y: 0.175 };
 const LENS = { x: 0.797, y: 0.475 };
@@ -22,7 +26,10 @@ const CHAIN_MASK_PATH = [
 const LENS_RING_RADIUS = 0.075;
 const LENS_MASK = { x: 0.797, y: 0.49, rx: 0.094, ry: 0.11 };
 const CHAIN_MASK_RADIUS = 0.025;
-const SWING = 0.075;
+const IRISES = [
+  { x: 0.514, y: 0.48, rx: 0.016, ry: 0.011 },
+  { x: 0.606, y: 0.461, rx: 0.013, ry: 0.0095 },
+];
 
 type Dot = {
   x: number;
@@ -93,14 +100,15 @@ export default function HomeHero() {
     let width = 0;
     let height = 0;
     let baseDots: Dot[] = [];
-    let phase = 0;
+    let irisDots: Dot[] = [];
+    let pendulumAngle = 0;
+    let pendulumVelocity = 0;
+    let pendulumReady = false;
     let pivotX = 0;
     let pivotY = 0;
     let lensOrbit = 0;
     let lensRing = 0;
     let baseChainAngle = 0;
-    let baseLensX = 0;
-    let baseLensY = 0;
     let gridCell = 0;
     let gridCols = 0;
     let gridRows = 0;
@@ -125,7 +133,7 @@ export default function HomeHero() {
       chainAngle: number,
       lensCenterX: number,
       lensCenterY: number,
-      wave: number,
+      bladeRotation: number,
     ) => {
       const directionX = Math.sin(chainAngle);
       const directionY = Math.cos(chainAngle);
@@ -171,9 +179,6 @@ export default function HomeHero() {
       const maxGx = Math.ceil((lensCenterX + rMax) / gridCell);
       const minGy = Math.floor((lensCenterY - rMax) / gridCell);
       const maxGy = Math.ceil((lensCenterY + rMax) / gridCell);
-      const bladeRotation = reduced
-        ? 0
-        : wave * (Math.PI / 6) + 0.08 * Math.sin(wave - 0.8);
 
       for (let gy = minGy; gy <= maxGy; gy += 1) {
         for (let gx = minGx; gx <= maxGx; gx += 1) {
@@ -273,10 +278,29 @@ export default function HomeHero() {
       context.clearRect(0, 0, width, height);
       context.fillStyle = INK;
 
-      const wave = reduced ? 0 : (phase / LOOP_SECONDS) * Math.PI * 2;
-      const swingWave = reduced ? 0 : wave - 0.22;
-      const chainAngle =
-        baseChainAngle + SWING * Math.sin(swingWave);
+      const currentPendulum = reduced ? 0 : pendulumAngle;
+      const irisShift =
+        Math.round(
+          Math.max(-1, Math.min(1, currentPendulum / SWING)) *
+            MAX_IRIS_CELLS,
+        ) * gridCell;
+
+      if (irisShift !== 0 || irisDots.length > 0) {
+        for (const dot of irisDots) {
+          const size = Math.min(dot.size * 0.94, dot.maxSize);
+
+          if (size < 0.45) continue;
+
+          context.fillRect(
+            dot.x + irisShift - size / 2,
+            dot.y - size / 2,
+            size,
+            size,
+          );
+        }
+      }
+
+      const chainAngle = baseChainAngle + currentPendulum;
       const lensCenterX = pivotX + Math.sin(chainAngle) * lensOrbit;
       const lensCenterY = pivotY + Math.cos(chainAngle) * lensOrbit;
       const lensHoleRadius = lensRing * 1.04;
@@ -287,7 +311,12 @@ export default function HomeHero() {
       context.fill();
       context.fillStyle = INK;
 
-      buildPendantDensity(chainAngle, lensCenterX, lensCenterY, wave);
+      buildPendantDensity(
+        chainAngle,
+        lensCenterX,
+        lensCenterY,
+        currentPendulum,
+      );
 
       if (densityMap) {
         for (const index of touchedCells) {
@@ -296,11 +325,8 @@ export default function HomeHero() {
           const gy = Math.floor(index / gridCols);
           const x = (gx + 0.5) * gridCell;
           const y = (gy + 0.5) * gridCell;
-          const dotPhase =
-            Math.hypot(x - baseLensX, y - baseLensY) * 0.03;
-          const pulse = 0.78 + 0.22 * Math.sin(wave - dotPhase);
           const size = Math.min(
-            Math.pow(density, 0.6) * gridCell * 0.96 * pulse,
+            Math.pow(density, 0.6) * gridCell * 0.96,
             gridCell,
           );
 
@@ -331,13 +357,41 @@ export default function HomeHero() {
 
       if (lastPaint === 0) lastPaint = timestamp;
 
-      if (timestamp - lastPaint < 50) {
+      if (timestamp - lastPaint < FRAME_MS) {
         frame = requestAnimationFrame(tick);
         return;
       }
 
       const elapsed = Math.min(0.1, (timestamp - lastPaint) / 1000);
-      phase = (phase + elapsed) % LOOP_SECONDS;
+      const steps = Math.max(1, Math.ceil(elapsed * 120));
+      const step = elapsed / steps;
+
+      for (let index = 0; index < steps; index += 1) {
+        const previousAngle = pendulumAngle;
+        const acceleration = -GRAVITY * Math.sin(pendulumAngle);
+
+        pendulumVelocity += acceleration * step;
+        pendulumAngle += pendulumVelocity * step;
+
+        if (
+          previousAngle !== 0 &&
+          Math.sign(previousAngle) !== Math.sign(pendulumAngle)
+        ) {
+          pendulumVelocity =
+            Math.sign(pendulumVelocity || pendulumAngle || 1) * MAX_SPEED;
+        }
+      }
+
+      const swingLimit = SWING * 1.005;
+
+      if (pendulumAngle > swingLimit) {
+        pendulumAngle = swingLimit;
+        pendulumVelocity = Math.min(0, pendulumVelocity);
+      } else if (pendulumAngle < -swingLimit) {
+        pendulumAngle = -swingLimit;
+        pendulumVelocity = Math.max(0, pendulumVelocity);
+      }
+
       lastPaint = timestamp;
       draw();
       frame = requestAnimationFrame(tick);
@@ -432,8 +486,6 @@ export default function HomeHero() {
       lensRing =
         ((LENS_RING_RADIUS * naturalWidth) / sourceWidth) * width;
 
-      baseLensX = pivotX + Math.sin(baseChainAngle) * lensOrbit;
-      baseLensY = pivotY + Math.cos(baseChainAngle) * lensOrbit;
       const lensMaskCenterX = LENS_MASK.x * naturalWidth;
       const lensMaskCenterY = LENS_MASK.y * naturalHeight;
       const lensMaskRadiusX = LENS_MASK.rx * naturalWidth;
@@ -444,6 +496,13 @@ export default function HomeHero() {
         y: point.y * naturalHeight,
       }));
       baseDots = [];
+      irisDots = [];
+      const eyeData = IRISES.map((eye) => ({
+        x: eye.x * naturalWidth,
+        y: eye.y * naturalHeight,
+        rx: eye.rx * naturalWidth,
+        ry: eye.ry * naturalHeight,
+      }));
 
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
@@ -488,12 +547,30 @@ export default function HomeHero() {
 
           if (density < 0.07) continue;
 
-          baseDots.push({
+          let isIris = false;
+
+          for (const eye of eyeData) {
+            const eyeX = (sourceDotX - eye.x) / eye.rx;
+            const eyeY = (sourceDotY - eye.y) / eye.ry;
+
+            if (eyeX * eyeX + eyeY * eyeY < 1) {
+              isIris = true;
+              break;
+            }
+          }
+
+          const dot = {
             x: (x + 0.5) * cell,
             y: (y + 0.5) * cell,
             size: Math.pow(density, 0.6) * cell * 0.96,
             maxSize: cell,
-          });
+          };
+
+          if (isIris) {
+            irisDots.push(dot);
+          } else {
+            baseDots.push(dot);
+          }
         }
       }
 
@@ -513,7 +590,12 @@ export default function HomeHero() {
         );
       }
 
-      phase = 0;
+      if (!pendulumReady || reduced) {
+        pendulumAngle = reduced ? 0 : SWING;
+        pendulumVelocity = 0;
+        pendulumReady = true;
+      }
+
       draw();
       image.style.opacity = "0";
       start();
@@ -551,7 +633,8 @@ export default function HomeHero() {
       }
 
       revealed = true;
-      phase = 0;
+      pendulumAngle = reduced ? 0 : SWING;
+      pendulumVelocity = 0;
       draw();
       start();
     };
@@ -574,8 +657,13 @@ export default function HomeHero() {
 
       if (reduced) {
         stop();
+        pendulumAngle = 0;
+        pendulumVelocity = 0;
         draw();
       } else {
+        pendulumAngle = 0;
+        pendulumVelocity = MAX_SPEED;
+        draw();
         start();
       }
     };
