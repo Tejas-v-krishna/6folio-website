@@ -6,6 +6,7 @@ import MethodAscii from "@/components/method-ascii";
 import MethodIcon from "@/components/method-icon";
 import ProjectCard from "@/components/project-card";
 import Reveal from "@/components/reveal";
+import WhySection from "@/components/why-section";
 import { ArrowUpRight } from "@/components/marks";
 import { SixFPattern } from "@/components/six-f";
 import { projects } from "@/content/projects";
@@ -57,61 +58,7 @@ export default function HomePage() {
     <>
       <HomeHero />
 
-      <Reveal delay={80}>
-        <section className="sheet">
-          <div className="sheet-pad-lg">
-            <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-7">
-                <div className="flex items-center gap-3">
-                  <span className="badge-icon" aria-hidden="true">
-                    6
-                  </span>
-                  <p className="eyebrow">Why 6FOLIO</p>
-                </div>
-                <h2 className="display-lg mt-5 max-w-2xl">
-                  A clearer way to build the whole picture.
-                </h2>
-              </div>
-              <p className="body-copy max-w-md lg:col-span-4 lg:col-start-9">
-                A brand is not built in separate pieces. The words affect the
-                visuals. The visuals shape the campaign. The campaign leads
-                people to an experience. The experience decides whether they
-                stay, enquire, or leave.
-              </p>
-            </div>
-
-            <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
-              <div className="border-t border-rule pt-5">
-                <h3 className="text-[1.25rem] font-semibold tracking-[-0.035em]">
-                  Joined-up thinking
-                </h3>
-                <p className="body-copy mt-3">
-                  The people behind the words, visuals, campaign, and experience
-                  sit in the same conversation.
-                </p>
-              </div>
-              <div className="border-t border-rule pt-5">
-                <h3 className="text-[1.25rem] font-semibold tracking-[-0.035em]">
-                  Fewer disconnected outputs
-                </h3>
-                <p className="body-copy mt-3">
-                  Every part has a job to do and a reason to exist. The work
-                  stays connected from first thought to final interaction.
-                </p>
-              </div>
-              <div className="border-t border-rule pt-5">
-                <h3 className="text-[1.25rem] font-semibold tracking-[-0.035em]">
-                  A standard you can feel
-                </h3>
-                <p className="body-copy mt-3">
-                  Clear thinking, careful craft, honest outcomes. The details
-                  are not decoration. They are how the work earns trust.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Reveal>
+      <WhySection />
 
       <Reveal delay={140}>
         <section className="sheet">
