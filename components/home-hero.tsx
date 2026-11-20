@@ -11,10 +11,17 @@ const LOOP_SECONDS = 6;
 
 const PIVOT = { x: 0.65, y: 0.175 };
 const LENS = { x: 0.797, y: 0.475 };
-const CHAIN_MASK_START = { x: 0.665, y: 0.2 };
+const CHAIN_MASK_PATH = [
+  { x: 0.67, y: 0.205 },
+  { x: 0.69, y: 0.245 },
+  { x: 0.715, y: 0.3 },
+  { x: 0.74, y: 0.355 },
+  { x: 0.765, y: 0.41 },
+  { x: 0.79, y: 0.465 },
+];
 const LENS_RING_RADIUS = 0.075;
 const LENS_MASK = { x: 0.797, y: 0.49, rx: 0.094, ry: 0.11 };
-const CHAIN_MASK_RADIUS = 0.015;
+const CHAIN_MASK_RADIUS = 0.025;
 const SWING = 0.075;
 const EYES = [
   { x: 0.419, y: 0.44, rx: 0.032, ry: 0.024 },
@@ -469,8 +476,6 @@ export default function HomeHero() {
       const pivotSourceY = PIVOT.y * naturalHeight;
       const lensSourceX = LENS.x * naturalWidth;
       const lensSourceY = LENS.y * naturalHeight;
-      const chainMaskStartX = CHAIN_MASK_START.x * naturalWidth;
-      const chainMaskStartY = CHAIN_MASK_START.y * naturalHeight;
       const orbitSource = Math.hypot(
         lensSourceX - pivotSourceX,
         lensSourceY - pivotSourceY,
@@ -493,6 +498,10 @@ export default function HomeHero() {
       const lensMaskRadiusX = LENS_MASK.rx * naturalWidth;
       const lensMaskRadiusY = LENS_MASK.ry * naturalHeight;
       const chainMaskRadius = CHAIN_MASK_RADIUS * naturalWidth;
+      const chainMaskPoints = CHAIN_MASK_PATH.map((point) => ({
+        x: point.x * naturalWidth,
+        y: point.y * naturalHeight,
+      }));
       const eyeData = EYES.map((eye) => ({
         x: eye.x * naturalWidth,
         y: eye.y * naturalHeight,
@@ -522,17 +531,28 @@ export default function HomeHero() {
           const maskY =
             (sourceDotY - lensMaskCenterY) / lensMaskRadiusY;
 
-          if (
-            maskX * maskX + maskY * maskY < 1 ||
-            distanceToSegment(
-              sourceDotX,
-              sourceDotY,
-              chainMaskStartX,
-              chainMaskStartY,
-              lensSourceX,
-              lensSourceY,
-            ) < chainMaskRadius
-          ) {
+          let chainMasked = false;
+
+          for (let index = 0; index < chainMaskPoints.length - 1; index += 1) {
+            const start = chainMaskPoints[index];
+            const end = chainMaskPoints[index + 1];
+
+            if (
+              distanceToSegment(
+                sourceDotX,
+                sourceDotY,
+                start.x,
+                start.y,
+                end.x,
+                end.y,
+              ) < chainMaskRadius
+            ) {
+              chainMasked = true;
+              break;
+            }
+          }
+
+          if (maskX * maskX + maskY * maskY < 1 || chainMasked) {
             continue;
           }
 
