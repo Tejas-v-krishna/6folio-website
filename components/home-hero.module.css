@@ -16,8 +16,6 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  transform-origin: 55% 45%;
-  animation: engraving-breath 6s ease-in-out infinite;
 }
 
 .engravingImage,
@@ -46,16 +44,6 @@
   z-index: 1;
 }
 
-@keyframes engraving-breath {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.004);
-  }
-}
 
 .stageTop {
   position: absolute;
@@ -424,10 +412,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portrait {
-    animation: none;
-  }
-
   .verticalNav::before,
   .verticalNav a,
   .cta,
