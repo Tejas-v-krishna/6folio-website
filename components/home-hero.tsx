@@ -187,6 +187,39 @@ export default function HomeHero() {
         }
       }
 
+      const lastChainPoint = chainPoints[chainPoints.length - 1];
+      const toLensX = lensCenterX - lastChainPoint.x;
+      const toLensY = lensCenterY - lastChainPoint.y;
+      const toLensLength = Math.hypot(toLensX, toLensY);
+
+      if (toLensLength > 0.001) {
+        const bailLength = lensRing * 0.34;
+        const bailSteps = Math.max(
+          2,
+          Math.round(bailLength / (gridCell * 0.5)),
+        );
+
+        for (let index = 0; index <= bailSteps; index += 1) {
+          const t = index / bailSteps;
+          const x =
+            lastChainPoint.x + (toLensX / toLensLength) * bailLength * t;
+          const y =
+            lastChainPoint.y + (toLensY / toLensLength) * bailLength * t;
+          const gx = Math.floor(x / gridCell);
+          const gy = Math.floor(y / gridCell);
+
+          setDensity(gx, gy, 1);
+
+          for (const side of [-1, 1]) {
+            setDensity(
+              Math.floor((x + side * gridCell * 0.55) / gridCell),
+              gy,
+              0.72,
+            );
+          }
+        }
+      }
+
       const rMax = lensRing * 1.24;
       const minGx = Math.floor((lensCenterX - rMax) / gridCell);
       const maxGx = Math.ceil((lensCenterX + rMax) / gridCell);
