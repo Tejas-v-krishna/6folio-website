@@ -9,12 +9,15 @@ const PAPER = "#f0ead9";
 const INK = "#2834b8";
 const FRAME_MS = 1000 / 20;
 const GRAVITY = Math.pow((2 * Math.PI) / 3.8, 2);
-const SWING = 0.17;
-const REST_OFFSET = 0.05;
+const SWING = 0.13;
+const REST_OFFSET = 0.1;
 const MAX_SPEED = Math.sqrt(
-  2 * GRAVITY * (1 - Math.cos(SWING / 2)),
+  2 * GRAVITY * (1 - Math.cos(SWING)),
 );
 const MAX_IRIS_CELLS = 2;
+const ROPE_SEGMENTS = 18;
+const ROPE_SLACK = 1.045;
+const ROPE_GRAVITY = 2400;
 
 const PIVOT = { x: 0.65, y: 0.175 };
 const LENS = { x: 0.797, y: 0.475 };
@@ -112,6 +115,9 @@ export default function HomeHero() {
     let lensOrbit = 0;
     let lensRing = 0;
     let baseChainAngle = 0;
+    let chainLength = 0;
+    let ropeSegmentLength = 0;
+    let ropeNodes: { x: number; y: number; px: number; py: number }[] = [];
     let gridCell = 0;
     let gridCols = 0;
     let gridRows = 0;
@@ -133,47 +139,51 @@ export default function HomeHero() {
     };
 
     const buildPendantDensity = (
-      chainAngle: number,
+      chainPoints: { x: number; y: number }[],
       lensCenterX: number,
       lensCenterY: number,
       bladeRotation: number,
     ) => {
-      const directionX = Math.sin(chainAngle);
-      const directionY = Math.cos(chainAngle);
-      const chainEndX = lensCenterX - directionX * lensRing * 0.96;
-      const chainEndY = lensCenterY - directionY * lensRing * 0.96;
-      const chainX = chainEndX - pivotX;
-      const chainY = chainEndY - pivotY;
-      const chainLength = Math.hypot(chainX, chainY);
-
-      if (chainLength < 1) return;
-
       const step = Math.max(gridCell * 1.15, 3);
-      const steps = Math.max(1, Math.round(chainLength / step));
-      const perpendicularX = -chainY / chainLength;
-      const perpendicularY = chainX / chainLength;
+      let linkIndex = 0;
 
-      for (let index = 0; index <= steps; index += 1) {
-        const t = index / steps;
-        const x = pivotX + chainX * t;
-        const y = pivotY + chainY * t;
-        const gx = Math.floor(x / gridCell);
-        const gy = Math.floor(y / gridCell);
-        const isLink = index % 4 === 0;
+      for (let segment = 0; segment < chainPoints.length - 1; segment += 1) {
+        const start = chainPoints[segment];
+        const end = chainPoints[segment + 1];
+        const chainX = end.x - start.x;
+        const chainY = end.y - start.y;
+        const segmentLength = Math.hypot(chainX, chainY);
 
-        setDensity(gx, gy, isLink ? 0.95 : 0.7);
+        if (segmentLength < 0.001) continue;
 
-        if (isLink) {
-          for (const offset of [-1, 1]) {
-            const shoulderX = x + perpendicularX * offset * gridCell;
-            const shoulderY = y + perpendicularY * offset * gridCell;
+        const steps = Math.max(1, Math.round(segmentLength / step));
+        const perpendicularX = -chainY / segmentLength;
+        const perpendicularY = chainX / segmentLength;
 
-            setDensity(
-              Math.floor(shoulderX / gridCell),
-              Math.floor(shoulderY / gridCell),
-              0.55,
-            );
+        for (let index = 0; index <= steps; index += 1) {
+          const t = index / steps;
+          const x = start.x + chainX * t;
+          const y = start.y + chainY * t;
+          const gx = Math.floor(x / gridCell);
+          const gy = Math.floor(y / gridCell);
+          const isLink = linkIndex % 4 === 0;
+
+          setDensity(gx, gy, isLink ? 0.95 : 0.7);
+
+          if (isLink) {
+            for (const offset of [-1, 1]) {
+              const shoulderX = x + perpendicularX * offset * gridCell;
+              const shoulderY = y + perpendicularY * offset * gridCell;
+
+              setDensity(
+                Math.floor(shoulderX / gridCell),
+                Math.floor(shoulderY / gridCell),
+                0.55,
+              );
+            }
           }
+
+          linkIndex += 1;
         }
       }
 
@@ -275,6 +285,111 @@ export default function HomeHero() {
       }
     };
 
+    const chainGeometry = (angle: number) => {
+      const directionX = Math.sin(angle);
+      const directionY = Math.cos(angle);
+      const lensCenterX = pivotX + directionX * lensOrbit;
+      const lensCenterY = pivotY + directionY * lensOrbit;
+
+      return {
+        directionX,
+        directionY,
+        lensCenterX,
+        lensCenterY,
+        topX: lensCenterX - directionX * lensRing * 0.96,
+        topY: lensCenterY - directionY * lensRing * 0.96,
+      };
+    };
+
+    const resetRope = () => {
+      if (chainLength <= 0) {
+        ropeNodes = [];
+        return;
+      }
+
+      const angle =
+        baseChainAngle + REST_OFFSET + (reduced ? 0 : pendulumAngle);
+      const geometry = chainGeometry(angle);
+      const straightStep = chainLength / ROPE_SEGMENTS;
+
+      ropeSegmentLength =
+        (chainLength * ROPE_SLACK) / ROPE_SEGMENTS;
+      ropeNodes = [];
+
+      for (let index = 0; index <= ROPE_SEGMENTS; index += 1) {
+        const x = pivotX + geometry.directionX * straightStep * index;
+        const y = pivotY + geometry.directionY * straightStep * index;
+
+        ropeNodes.push({ x, y, px: x, py: y });
+      }
+    };
+
+    const updateRope = (
+      dt: number,
+      previousTopX: number,
+      previousTopY: number,
+      nextTopX: number,
+      nextTopY: number,
+    ) => {
+      const lastIndex = ropeNodes.length - 1;
+
+      if (lastIndex < 2 || ropeSegmentLength <= 0) return;
+
+      for (let index = 1; index < lastIndex; index += 1) {
+        const node = ropeNodes[index];
+        const velocityX = (node.x - node.px) * 0.9995;
+        const velocityY = (node.y - node.py) * 0.9995;
+
+        node.px = node.x;
+        node.py = node.y;
+        node.x += velocityX;
+        node.y += velocityY + ROPE_GRAVITY * dt * dt;
+      }
+
+      const lastNode = ropeNodes[lastIndex];
+
+      lastNode.px = previousTopX;
+      lastNode.py = previousTopY;
+      lastNode.x = nextTopX;
+      lastNode.y = nextTopY;
+
+      for (let iteration = 0; iteration < 4; iteration += 1) {
+        for (let index = 0; index < lastIndex; index += 1) {
+          const start = ropeNodes[index];
+          const end = ropeNodes[index + 1];
+          const deltaX = end.x - start.x;
+          const deltaY = end.y - start.y;
+          const distance = Math.hypot(deltaX, deltaY);
+
+          if (distance < 0.0001) continue;
+
+          const correction = (distance - ropeSegmentLength) / distance;
+
+          if (index === 0) {
+            end.x -= deltaX * correction;
+            end.y -= deltaY * correction;
+          } else if (index === lastIndex - 1) {
+            start.x += deltaX * correction;
+            start.y += deltaY * correction;
+          } else {
+            const move = correction * 0.5;
+            start.x += deltaX * move;
+            start.y += deltaY * move;
+            end.x -= deltaX * move;
+            end.y -= deltaY * move;
+          }
+        }
+      }
+
+      const top = ropeNodes[0];
+      top.x = pivotX;
+      top.y = pivotY;
+      top.px = pivotX;
+      top.py = pivotY;
+      lastNode.x = nextTopX;
+      lastNode.y = nextTopY;
+    };
+
     const draw = () => {
       if (width === 0 || height === 0) return;
 
@@ -303,22 +418,35 @@ export default function HomeHero() {
         }
       }
 
-      const chainAngle =
+      const currentChainAngle =
         baseChainAngle + REST_OFFSET + currentPendulum;
-      const lensCenterX = pivotX + Math.sin(chainAngle) * lensOrbit;
-      const lensCenterY = pivotY + Math.cos(chainAngle) * lensOrbit;
+      const geometry = chainGeometry(currentChainAngle);
       const lensHoleRadius = lensRing * 1.04;
 
       context.fillStyle = PAPER;
       context.beginPath();
-      context.arc(lensCenterX, lensCenterY, lensHoleRadius, 0, Math.PI * 2);
+      context.arc(
+        geometry.lensCenterX,
+        geometry.lensCenterY,
+        lensHoleRadius,
+        0,
+        Math.PI * 2,
+      );
       context.fill();
       context.fillStyle = INK;
 
+      const chainPoints =
+        reduced || ropeNodes.length < 2
+          ? [
+              { x: pivotX, y: pivotY },
+              { x: geometry.topX, y: geometry.topY },
+            ]
+          : ropeNodes;
+
       buildPendantDensity(
-        chainAngle,
-        lensCenterX,
-        lensCenterY,
+        chainPoints,
+        geometry.lensCenterX,
+        geometry.lensCenterY,
         currentPendulum,
       );
 
@@ -372,30 +500,41 @@ export default function HomeHero() {
 
       for (let index = 0; index < steps; index += 1) {
         const previousAngle = pendulumAngle;
-        const acceleration = -GRAVITY *
-          Math.sin(pendulumAngle - SWING / 2);
+        const acceleration = -GRAVITY * Math.sin(pendulumAngle);
 
         pendulumVelocity += acceleration * step;
         pendulumAngle += pendulumVelocity * step;
 
-        const previousOffset = previousAngle - SWING / 2;
-        const currentOffset = pendulumAngle - SWING / 2;
-
         if (
-          previousOffset !== 0 &&
-          Math.sign(previousOffset) !== Math.sign(currentOffset)
+          previousAngle !== 0 &&
+          Math.sign(previousAngle) !== Math.sign(pendulumAngle)
         ) {
           pendulumVelocity =
-            Math.sign(pendulumVelocity || currentOffset || 1) * MAX_SPEED;
+            Math.sign(pendulumVelocity || pendulumAngle || 1) * MAX_SPEED;
         }
-      }
 
-      if (pendulumAngle > SWING) {
-        pendulumAngle = SWING;
-        pendulumVelocity = Math.min(0, pendulumVelocity);
-      } else if (pendulumAngle < 0) {
-        pendulumAngle = 0;
-        pendulumVelocity = Math.max(0, pendulumVelocity);
+        if (pendulumAngle > SWING) {
+          pendulumAngle = SWING;
+          pendulumVelocity = Math.min(0, pendulumVelocity);
+        } else if (pendulumAngle < -SWING) {
+          pendulumAngle = -SWING;
+          pendulumVelocity = Math.max(0, pendulumVelocity);
+        }
+
+        const previousAngleWithOffset =
+          baseChainAngle + REST_OFFSET + previousAngle;
+        const nextAngleWithOffset =
+          baseChainAngle + REST_OFFSET + pendulumAngle;
+        const previousGeometry = chainGeometry(previousAngleWithOffset);
+        const nextGeometry = chainGeometry(nextAngleWithOffset);
+
+        updateRope(
+          step,
+          previousGeometry.topX,
+          previousGeometry.topY,
+          nextGeometry.topX,
+          nextGeometry.topY,
+        );
       }
 
       lastPaint = timestamp;
@@ -491,6 +630,7 @@ export default function HomeHero() {
       lensOrbit = (orbitSource / sourceWidth) * width;
       lensRing =
         ((LENS_RING_RADIUS * naturalWidth) / sourceWidth) * width;
+      chainLength = lensOrbit - lensRing * 0.96;
 
       const lensMaskCenterX = LENS_MASK.x * naturalWidth;
       const lensMaskCenterY = LENS_MASK.y * naturalHeight;
@@ -596,12 +736,16 @@ export default function HomeHero() {
         );
       }
 
-      if (!pendulumReady || reduced) {
-        pendulumAngle = 0;
+      if (!pendulumReady) {
+        pendulumAngle = reduced ? 0 : SWING;
         pendulumVelocity = 0;
         pendulumReady = true;
+      } else if (reduced) {
+        pendulumAngle = 0;
+        pendulumVelocity = 0;
       }
 
+      resetRope();
       draw();
       image.style.opacity = "0";
       start();
@@ -639,8 +783,9 @@ export default function HomeHero() {
       }
 
       revealed = true;
-      pendulumAngle = 0;
+      pendulumAngle = reduced ? 0 : SWING;
       pendulumVelocity = 0;
+      resetRope();
       draw();
       start();
     };
@@ -665,10 +810,12 @@ export default function HomeHero() {
         stop();
         pendulumAngle = 0;
         pendulumVelocity = 0;
+        resetRope();
         draw();
       } else {
         pendulumAngle = 0;
         pendulumVelocity = MAX_SPEED;
+        resetRope();
         draw();
         start();
       }
