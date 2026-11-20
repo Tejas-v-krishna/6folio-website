@@ -74,7 +74,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="mx-auto mt-8 max-w-[1100px] overflow-hidden rounded-[26px] border-2 border-accent bg-white">
+            <div className="mx-auto mt-8 max-w-[1100px] overflow-hidden rounded-[26px] border-2 border-accent bg-cream">
               <div className="grid md:grid-cols-[0.45fr_0.55fr]">
                 <div className="relative flex min-h-[520px] flex-col bg-[linear-gradient(155deg,#0c27c2_0%,#1636f8_58%,#2450ff_100%)] p-6 text-white md:p-8">
                   <div>
@@ -113,11 +113,11 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="grid auto-rows-fr gap-3 bg-white p-3">
+                <div className="grid auto-rows-fr gap-3 bg-cream p-3">
                   {methodSteps.map((step) => (
                     <div
                       key={step.number}
-                      className="flex flex-col justify-between rounded-[16px] border border-accent/50 bg-white p-5 md:p-6"
+                      className="flex flex-col justify-between rounded-[16px] border border-accent/50 bg-cream p-5 md:p-6"
                     >
                       <MethodIcon
                         name={step.icon}
