@@ -24,8 +24,8 @@ const LENS_MASK = { x: 0.797, y: 0.49, rx: 0.094, ry: 0.11 };
 const CHAIN_MASK_RADIUS = 0.025;
 const SWING = 0.075;
 const EYES = [
-  { x: 0.419, y: 0.44, rx: 0.032, ry: 0.024 },
-  { x: 0.586, y: 0.435, rx: 0.032, ry: 0.024 },
+  { x: 0.419, y: 0.44, rx: 0.018, ry: 0.0145 },
+  { x: 0.586, y: 0.435, rx: 0.018, ry: 0.0145 },
 ];
 
 type Dot = {
@@ -35,13 +35,6 @@ type Dot = {
   maxSize: number;
 };
 
-type EyeCell = {
-  x: number;
-  y: number;
-  gridX: number;
-  gridY: number;
-  eyeWeight: number;
-};
 
 const navItems = [
   { label: "Work", href: "/work" },
@@ -104,8 +97,7 @@ export default function HomeHero() {
     let width = 0;
     let height = 0;
     let baseDots: Dot[] = [];
-    let eyeCells: EyeCell[] = [];
-    let gridData: Uint8ClampedArray | null = null;
+    let irisDots: Dot[] = [];
     let phase = 0;
     let pivotX = 0;
     let pivotY = 0;
@@ -132,38 +124,6 @@ export default function HomeHero() {
       if (value <= current) return;
       if (current === 0) touchedCells.push(index);
       densityMap[index] = value;
-    };
-
-    const sampleDensity = (x: number, y: number) => {
-      if (!gridData) return 0;
-
-      const x0 = Math.max(0, Math.min(gridCols - 1, Math.floor(x)));
-      const y0 = Math.max(0, Math.min(gridRows - 1, Math.floor(y)));
-      const x1 = Math.min(gridCols - 1, x0 + 1);
-      const y1 = Math.min(gridRows - 1, y0 + 1);
-      const tx = Math.max(0, Math.min(1, x - x0));
-      const ty = Math.max(0, Math.min(1, y - y0));
-
-      const luminanceAt = (ix: number, iy: number) => {
-        const offset = (iy * gridCols + ix) * 4;
-        const r = gridData?.[offset] ?? 0;
-        const g = gridData?.[offset + 1] ?? 0;
-        const b = gridData?.[offset + 2] ?? 0;
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      };
-
-      const densityAt = (ix: number, iy: number) =>
-        Math.max(
-          0,
-          Math.min(1, (244 - luminanceAt(ix, iy)) / 196),
-        );
-
-      const top =
-        densityAt(x0, y0) * (1 - tx) + densityAt(x1, y0) * tx;
-      const bottom =
-        densityAt(x0, y1) * (1 - tx) + densityAt(x1, y1) * tx;
-
-      return top * (1 - ty) + bottom * ty;
     };
 
     const buildPendantDensity = (
@@ -324,39 +284,19 @@ export default function HomeHero() {
         baseChainAngle + SWING * Math.sin(swingWave);
       const lensCenterX = pivotX + Math.sin(chainAngle) * lensOrbit;
       const lensCenterY = pivotY + Math.cos(chainAngle) * lensOrbit;
-      const eyeAngle = reduced
-        ? baseChainAngle
-        : baseChainAngle + SWING * Math.sin(wave - 0.34);
-      const eyeShiftX =
-        (Math.sin(eyeAngle) - Math.sin(baseChainAngle)) *
-        lensOrbit *
-        0.22;
-      const eyeShiftY = eyeShiftX * 0.14;
       const lensHoleRadius = lensRing * 1.04;
+      const swingRatio = reduced
+        ? 0
+        : (Math.sin(chainAngle) - Math.sin(baseChainAngle)) / SWING;
+      const irisShiftX = Math.round(swingRatio * 2.4) * gridCell;
 
-      const eyeShiftGridX = eyeShiftX / gridCell;
-      const eyeShiftGridY = eyeShiftY / gridCell;
-
-      for (const cell of eyeCells) {
-        const sampleX = cell.gridX + eyeShiftGridX * cell.eyeWeight;
-        const sampleY = cell.gridY + eyeShiftGridY * cell.eyeWeight;
-        const density = sampleDensity(sampleX, sampleY);
-
-        if (density < 0.07) continue;
-
-        const size = Math.min(
-          Math.pow(density, 0.6) * gridCell * 0.96 * 0.94,
-          gridCell,
-        );
+      for (const dot of irisDots) {
+        const x = dot.x + irisShiftX;
+        const size = Math.min(dot.size * 0.94, dot.maxSize);
 
         if (size < 0.45) continue;
 
-        context.fillRect(
-          cell.x - size / 2,
-          cell.y - size / 2,
-          size,
-          size,
-        );
+        context.fillRect(x - size / 2, dot.y - size / 2, size, size);
       }
 
       context.fillStyle = PAPER;
@@ -529,8 +469,7 @@ export default function HomeHero() {
       }));
 
       baseDots = [];
-      eyeCells = [];
-      gridData = data;
+      irisDots = [];
 
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
@@ -573,7 +512,7 @@ export default function HomeHero() {
             continue;
           }
 
-          let eyeWeight = 0;
+          let inIris = false;
 
           for (const eye of eyeData) {
             const eyeX = (sourceDotX - eye.x) / eye.rx;
@@ -581,22 +520,24 @@ export default function HomeHero() {
             const eyeDistance = eyeX * eyeX + eyeY * eyeY;
 
             if (eyeDistance < 1) {
-              const weight = Math.pow(1 - eyeDistance, 1.3);
-              if (weight > eyeWeight) eyeWeight = weight;
+              inIris = true;
+              break;
             }
           }
 
           const dotX = (x + 0.5) * cell;
           const dotY = (y + 0.5) * cell;
+          const dotSize = Math.pow(density, 0.6) * cell * 0.96;
 
-          if (eyeWeight > 0.02) {
-            eyeCells.push({
-              x: dotX,
-              y: dotY,
-              gridX: x,
-              gridY: y,
-              eyeWeight,
-            });
+          if (inIris) {
+            if (density >= 0.07) {
+              irisDots.push({
+                x: dotX,
+                y: dotY,
+                size: dotSize,
+                maxSize: cell,
+              });
+            }
             continue;
           }
 
@@ -605,7 +546,7 @@ export default function HomeHero() {
           baseDots.push({
             x: dotX,
             y: dotY,
-            size: Math.pow(density, 0.6) * cell * 0.96,
+            size: dotSize,
             maxSize: cell,
           });
         }
