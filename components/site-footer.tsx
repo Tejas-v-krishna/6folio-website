@@ -137,13 +137,13 @@ export default function SiteFooter() {
             <div className="relative z-10 flex flex-1 flex-col justify-between">
               <Link
                 href="/"
-                aria-label="6folio home"
                 className="flex w-fit items-center gap-2.5"
               >
                 <SixFBoxes tone="light" className="h-6 w-12 text-[9px]" />
                 <span className="text-[24px] font-bold leading-none tracking-[-0.06em]">
                   6folio
                 </span>
+                <span className="sr-only"> home</span>
               </Link>
 
               <div>

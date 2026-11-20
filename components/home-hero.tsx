@@ -603,12 +603,13 @@ export default function HomeHero() {
     >
       <div className={styles.stage}>
         <div className={styles.stageTop}>
-          <Link href="/" aria-label="6folio home" className={styles.brand}>
+          <Link href="/" className={styles.brand}>
             <span className={styles.brandMark} aria-hidden="true">
               <span>6</span>
               <span>F</span>
             </span>
             <span className={styles.brandName}>6folio</span>
+            <span className="sr-only"> home</span>
           </Link>
         </div>
 

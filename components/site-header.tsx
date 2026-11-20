@@ -241,13 +241,13 @@ export default function SiteHeader() {
           <div className="flex h-[60px] items-center gap-4 px-3 md:px-4">
             <Link
               href="/"
-              aria-label="6folio home"
               className="flex shrink-0 items-center gap-2.5"
             >
               <SixFBoxes className="h-5 w-10 text-[8px]" />
               <span className="text-[20px] font-bold leading-none tracking-[-0.055em]">
                 6folio
               </span>
+              <span className="sr-only"> home</span>
             </Link>
 
             <nav

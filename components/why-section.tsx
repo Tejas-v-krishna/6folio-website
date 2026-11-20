@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { services } from "@/content/services";
 import styles from "./why-section.module.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const INK = "#2834b8";
 const HEADER_OFFSET = 61;
-const MORPH_END = 0.9;
+const FORMED_AT = 0.64;
 
 const principles = [
   {
@@ -26,35 +27,52 @@ const principles = [
   },
 ];
 
-const GLYPH_6 = [
-  "01110",
-  "10000",
-  "10000",
-  "11110",
-  "10001",
-  "10001",
-  "01110",
-];
+const WHEEL_OUTER = 0.455;
+const WHEEL_RING = 0.965;
+const WHEEL_HUB = 0.185;
+const WHEEL_BLADE_INNER = 0.24;
+const WHEEL_BLADE_OUTER = 0.92;
+const WHEEL_CURVE_START = 0.14;
+const WHEEL_CURVE_END = 0.72;
+const WHEEL_LABEL_RADIUS = 0.6;
+const WHEEL_BASE_ANGLE = -Math.PI / 2 + 0.08;
+const WHEEL_LABEL_T =
+  (WHEEL_LABEL_RADIUS - WHEEL_BLADE_INNER) /
+  (WHEEL_BLADE_OUTER - WHEEL_BLADE_INNER);
+const WHEEL_LABEL_OFFSET =
+  WHEEL_CURVE_START +
+  (WHEEL_CURVE_END - WHEEL_CURVE_START) * WHEEL_LABEL_T;
+const LABEL_PERCENT = WHEEL_OUTER * WHEEL_LABEL_RADIUS * 100;
 
-const GLYPH_F = [
-  "11111",
-  "10000",
-  "10000",
-  "11110",
-  "10000",
-  "10000",
-  "10000",
-];
+const wheelOffers = services.map((service, index) => {
+  const angle =
+    WHEEL_BASE_ANGLE + (index * Math.PI) / 3 + WHEEL_LABEL_OFFSET;
 
-type MorphDot = {
-  sx: number;
-  sy: number;
-  tx: number;
-  ty: number;
-  ox: number;
-  oy: number;
+  return {
+    ...service,
+    left: 50 + Math.cos(angle) * LABEL_PERCENT,
+    top: 50 + Math.sin(angle) * LABEL_PERCENT,
+  };
+});
+
+type EmblemDot = {
+  x: number;
+  y: number;
+  size: number;
+  alpha: number;
+};
+
+type Particle = {
+  startRadius: number;
+  targetRadius: number;
+  startAngle: number;
+  angleDelta: number;
+  swirl: number;
   delay: number;
-  radius: number;
+  startSize: number;
+  targetSize: number;
+  startAlpha: number;
+  targetAlpha: number;
 };
 
 function clamp(value: number, min = 0, max = 1) {
@@ -71,6 +89,11 @@ function easeOutCubic(value: number) {
   return 1 - Math.pow(1 - value, 3);
 }
 
+function smoothstep(value: number) {
+  const clamped = clamp(value);
+  return clamped * clamped * (3 - 2 * clamped);
+}
+
 function seeded(index: number, salt: number) {
   const value = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
   return value - Math.floor(value);
@@ -80,71 +103,186 @@ function activeIndex(progress: number) {
   return progress < 0.34 ? 0 : progress < 0.67 ? 1 : 2;
 }
 
-function buildDots(width: number, height: number): MorphDot[] {
-  const markWidth = Math.min(width * 0.76, height * 1.08);
-  const cell = markWidth / 12;
-  const spacing = cell / 3.25;
-  const markHeight = cell * 7;
-  const originX = (width - markWidth) / 2;
-  const originY = (height - markHeight) / 2;
-  const clusterRadius = Math.min(width, height) * 0.31;
-  const jitter = Math.min(width, height) * 0.075;
-  const dots: MorphDot[] = [];
-  const glyphs = [
-    { col: 0, rows: GLYPH_6 },
-    { col: 7, rows: GLYPH_F },
-  ];
+function buildEmblem(width: number, height: number): EmblemDot[] {
+  const size = Math.min(width, height);
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const outerRadius = size * WHEEL_OUTER;
+  const ringRadius = outerRadius * WHEEL_RING;
+  const ringHalf = size * 0.012;
+  const hubRadius = outerRadius * WHEEL_HUB;
+  const hubHalf = size * 0.007;
+  const bladeInner = outerRadius * WHEEL_BLADE_INNER;
+  const bladeOuter = outerRadius * WHEEL_BLADE_OUTER;
+  const step = Math.max(2.6, size * 0.0048);
+  const cols = Math.ceil(width / step);
+  const rows = Math.ceil(height / step);
+  const dots: EmblemDot[] = [];
 
-  for (const glyph of glyphs) {
-    for (let row = 0; row < glyph.rows.length; row += 1) {
-      const line = glyph.rows[row];
+  for (let gy = 0; gy < rows; gy += 1) {
+    for (let gx = 0; gx < cols; gx += 1) {
+      const salt = gx + gy * cols;
+      const x = (gx + 0.5 + (seeded(salt, 1) - 0.5) * 0.82) * step;
+      const y = (gy + 0.5 + (seeded(salt, 2) - 0.5) * 0.82) * step;
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const radius = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      let density = 0;
 
-      for (let column = 0; column < line.length; column += 1) {
-        if (line[column] !== "1") continue;
+      const ringDistance = Math.abs(radius - ringRadius) / ringHalf;
 
-        for (let subRow = 0; subRow < 3; subRow += 1) {
-          for (let subColumn = 0; subColumn < 3; subColumn += 1) {
-            const index = dots.length;
-            const group = index % 6;
-            const angle = (group / 6) * Math.PI * 2 + 0.4;
-            const centerX = width / 2 + Math.cos(angle) * clusterRadius;
-            const centerY = height / 2 + Math.sin(angle) * clusterRadius;
-            const targetX =
-              originX +
-              (glyph.col + column + 0.5) * cell +
-              (subColumn - 1) * spacing;
-            const targetY =
-              originY +
-              (row + 0.5) * cell +
-              (subRow - 1) * spacing;
-            const startX =
-              centerX + (seeded(index, 1) - 0.5) * jitter * 2;
-            const startY =
-              centerY + (seeded(index, 2) - 0.5) * jitter * 2;
-            const arcMagnitude =
-              (seeded(index, 3) - 0.5) * Math.min(width, height) * 0.16;
+      if (ringDistance < 1) {
+        density = (1 - ringDistance * ringDistance) * 0.98;
+      }
 
-            dots.push({
-              sx: startX,
-              sy: startY,
-              tx: targetX,
-              ty: targetY,
-              ox: Math.cos(angle + Math.PI / 2) * arcMagnitude,
-              oy: Math.sin(angle + Math.PI / 2) * arcMagnitude,
-              delay: 0.02 + (group / 6) * 0.06 + seeded(index, 4) * 0.24,
-              radius: Math.max(1.4, cell * 0.115),
-            });
+      const hubDistance = Math.abs(radius - hubRadius) / hubHalf;
+
+      if (hubDistance < 1) {
+        density = Math.max(
+          density,
+          (1 - hubDistance * hubDistance) * 0.9,
+        );
+      }
+
+      const bladeT =
+        (radius - bladeInner) / (bladeOuter - bladeInner);
+
+      if (bladeT >= 0 && bladeT <= 1) {
+        for (let blade = 0; blade < 6; blade += 1) {
+          const center =
+            WHEEL_BASE_ANGLE +
+            (blade * Math.PI) / 3 +
+            WHEEL_CURVE_START +
+            (WHEEL_CURVE_END - WHEEL_CURVE_START) * bladeT;
+          const halfWidth = 0.14 + 0.34 * bladeT;
+          const difference = Math.atan2(
+            Math.sin(angle - center),
+            Math.cos(angle - center),
+          );
+          const ratio = Math.abs(difference) / halfWidth;
+
+          if (ratio <= 1) {
+            const edge = 1 - Math.pow(ratio, 4);
+            const grain =
+              0.86 + 0.14 * Math.sin(blade * 7.1 + bladeT * 9.3);
+
+            density = Math.max(density, 0.94 * edge * grain);
           }
         }
       }
+
+      if (density < 0.18) continue;
+
+      const threshold = seeded(salt, 3);
+
+      if (threshold > density) continue;
+
+      const dotSize = Math.min(
+        step * 0.84,
+        1.1 + density * 2.3 + seeded(salt, 4) * 0.55,
+      );
+
+      dots.push({
+        x,
+        y,
+        size: dotSize,
+        alpha: 0.82 + density * 0.18,
+      });
     }
   }
 
   return dots;
 }
 
+function buildParticles(
+  dots: EmblemDot[],
+  width: number,
+  height: number,
+): Particle[] {
+  if (dots.length === 0) return [];
+
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const cols = Math.ceil(Math.sqrt((dots.length * width) / height));
+  const rows = Math.ceil(dots.length / cols);
+  const particles: Particle[] = [];
+
+  dots.forEach((dot, index) => {
+    const column = index % cols;
+    const row = Math.floor(index / cols);
+    const startX =
+      ((column + 0.5 + (seeded(index, 11) - 0.5) * 0.92) * width) / cols;
+    const startY =
+      ((row + 0.5 + (seeded(index, 12) - 0.5) * 0.92) * height) / rows;
+    const startDx = startX - centerX;
+    const startDy = startY - centerY;
+    const startRadius = Math.hypot(startDx, startDy);
+    const targetRadius = Math.hypot(dot.x - centerX, dot.y - centerY);
+    const startAngle = Math.atan2(startDy, startDx);
+    const targetAngle = Math.atan2(dot.y - centerY, dot.x - centerX);
+    const angleDelta = Math.atan2(
+      Math.sin(targetAngle - startAngle),
+      Math.cos(targetAngle - startAngle),
+    );
+    const direction = angleDelta >= 0 ? 1 : -1;
+    const delay =
+      0.02 +
+      clamp(targetRadius / (Math.min(width, height) * WHEEL_OUTER)) *
+        0.14 +
+      seeded(index, 13) * 0.16;
+
+    particles.push({
+      startRadius,
+      targetRadius,
+      startAngle,
+      angleDelta,
+      swirl: direction * (0.25 + seeded(index, 14) * 0.6),
+      delay,
+      startSize: 1.3 + seeded(index, 15) * 1.7,
+      targetSize: dot.size,
+      startAlpha: 0.36 + seeded(index, 16) * 0.5,
+      targetAlpha: dot.alpha,
+    });
+  });
+
+  return particles;
+}
+
+function renderEmblem(
+  dots: EmblemDot[],
+  width: number,
+  height: number,
+  dpr: number,
+) {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width * dpr));
+  canvas.height = Math.max(1, Math.round(height * dpr));
+  const context = canvas.getContext("2d");
+
+  if (!context) return null;
+
+  context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  context.clearRect(0, 0, width, height);
+  context.fillStyle = INK;
+
+  for (const dot of dots) {
+    context.globalAlpha = dot.alpha;
+    context.fillRect(
+      dot.x - dot.size / 2,
+      dot.y - dot.size / 2,
+      dot.size,
+      dot.size,
+    );
+  }
+
+  context.globalAlpha = 1;
+  return canvas;
+}
+
 export default function WhySection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const figureRef = useRef<HTMLElement | null>(null);
   const visualRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
@@ -152,44 +290,79 @@ export default function WhySection() {
 
   useEffect(() => {
     const section = sectionRef.current;
+    const figure = figureRef.current;
     const visual = visualRef.current;
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d") ?? null;
 
-    if (!section || !visual || !canvas || !context) return;
+    if (!section || !figure || !visual || !canvas || !context) return;
 
     const motionQuery = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     );
     const desktopQuery = window.matchMedia("(min-width: 1024px)");
-    let dots: MorphDot[] = [];
     let width = 0;
     let height = 0;
     let progress = 0;
     let trigger: ScrollTrigger | null = null;
+    let emblemCanvas: HTMLCanvasElement | null = null;
+    let particles: Particle[] = [];
     let frame = 0;
     let disposed = false;
+    let formed = false;
+
+    const setFormed = (value: number) => {
+      const next = value >= FORMED_AT;
+
+      if (next === formed) return;
+      formed = next;
+      figure.dataset.formed = String(next);
+    };
 
     const draw = (value: number) => {
-      if (!context || width === 0 || height === 0) return;
+      if (width === 0 || height === 0) return;
 
       context.clearRect(0, 0, width, height);
-      context.fillStyle = INK;
 
-      const eased = easeInOutCubic(clamp(value / MORPH_END));
+      const emblemAlpha = smoothstep((value - 0.28) / 0.52);
 
-      for (const dot of dots) {
-        const local = clamp((eased - dot.delay) / (1 - dot.delay));
-        const t = easeOutCubic(local);
-        const arc = Math.sin(Math.PI * t);
-        const x = dot.sx + (dot.tx - dot.sx) * t + dot.ox * arc;
-        const y = dot.sy + (dot.ty - dot.sy) * t + dot.oy * arc;
-        const radius = dot.radius * (0.8 + 0.2 * t);
+      if (emblemCanvas && emblemAlpha > 0) {
+        context.globalAlpha = emblemAlpha;
+        context.drawImage(emblemCanvas, 0, 0, width, height);
+      }
 
-        context.globalAlpha = 0.58 + 0.42 * t;
-        context.beginPath();
-        context.arc(x, y, radius, 0, Math.PI * 2);
-        context.fill();
+      const formation = easeInOutCubic(clamp(value / 0.82));
+      const particleAlpha = 1 - smoothstep((value - 0.84) / 0.14);
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      if (particleAlpha > 0.01 && particles.length > 0) {
+        context.fillStyle = INK;
+
+        for (const particle of particles) {
+          const local = clamp(
+            (formation - particle.delay) / (1 - particle.delay),
+          );
+          const t = easeOutCubic(local);
+          const radius =
+            particle.startRadius +
+            (particle.targetRadius - particle.startRadius) * t;
+          const angle =
+            particle.startAngle +
+            particle.angleDelta * t +
+            particle.swirl * Math.sin(Math.PI * t);
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+          const size =
+            particle.startSize +
+            (particle.targetSize - particle.startSize) * t;
+
+          context.globalAlpha =
+            (particle.startAlpha +
+              (particle.targetAlpha - particle.startAlpha) * t) *
+            particleAlpha;
+          context.fillRect(x - size / 2, y - size / 2, size, size);
+        }
       }
 
       context.globalAlpha = 1;
@@ -204,9 +377,8 @@ export default function WhySection() {
     };
 
     const resize = () => {
-      if (!visual || !canvas || !context) return;
-
       const rect = visual.getBoundingClientRect();
+
       if (rect.width === 0 || rect.height === 0) return;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -217,7 +389,10 @@ export default function WhySection() {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      dots = buildDots(width, height);
+
+      const dots = buildEmblem(width, height);
+      emblemCanvas = renderEmblem(dots, width, height, dpr);
+      particles = buildParticles(dots, width, height);
       draw(progress);
     };
 
@@ -234,6 +409,7 @@ export default function WhySection() {
           progressBarRef.current.style.transform = "scaleY(0)";
         }
         setActive(-1);
+        setFormed(1);
         progress = 1;
         draw(1);
         return;
@@ -250,6 +426,7 @@ export default function WhySection() {
           setActive((current) =>
             current === nextActive ? current : nextActive,
           );
+          setFormed(progress);
 
           if (progressBarRef.current) {
             progressBarRef.current.style.transform = `scaleY(${progress})`;
@@ -261,6 +438,7 @@ export default function WhySection() {
 
       progress = trigger.progress;
       setActive(activeIndex(progress));
+      setFormed(progress);
 
       if (progressBarRef.current) {
         progressBarRef.current.style.transform = `scaleY(${progress})`;
@@ -301,7 +479,24 @@ export default function WhySection() {
       aria-labelledby="why-title"
     >
       <noscript>
-        <style>{`[data-why-section]{min-height:auto!important}[data-why-sticky]{position:static!important;height:auto!important;min-height:auto!important}[data-why-grid]{grid-template-columns:1fr!important}[data-why-visual]{display:none!important}[data-why-rail]{display:none!important}[data-why-title]{opacity:1!important}[data-why-body]{grid-template-rows:1fr!important}`}</style>
+        <style>{`
+          [data-why-section] { min-height: auto !important; }
+          [data-why-sticky] { position: static !important; height: auto !important; min-height: auto !important; }
+          [data-why-grid] { grid-template-columns: 1fr !important; }
+          [data-why-visual] { max-width: none !important; justify-self: stretch !important; }
+          [data-why-wheel] { aspect-ratio: auto !important; border: 0 !important; overflow: visible !important; container-type: normal !important; }
+          [data-why-canvas] { display: none !important; }
+          [data-why-offers] { position: static !important; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 0.8rem 1.5rem !important; }
+          [data-why-offer] { position: static !important; width: auto !important; padding: 0.55rem 0 !important; transform: none !important; opacity: 1 !important; border-top: 1px solid rgba(10, 10, 15, 0.14) !important; background: transparent !important; transition: none !important; }
+          [data-why-offer] > span:first-child { font-size: 0.58rem !important; }
+          [data-why-offer] > span:last-child { font-size: 0.78rem !important; line-height: 1.3 !important; }
+          [data-why-rail] { display: none !important; }
+          [data-why-title] { opacity: 1 !important; }
+          [data-why-body] { grid-template-rows: 1fr !important; }
+          @media (min-width: 900px) {
+            [data-why-offers] { grid-template-columns: repeat(3, 1fr) !important; }
+          }
+        `}</style>
       </noscript>
 
       <div data-why-sticky className={styles.sticky}>
@@ -359,17 +554,46 @@ export default function WhySection() {
           </div>
 
           <figure
+            ref={figureRef}
             data-why-visual
+            data-formed="false"
             className={styles.figure}
-            aria-hidden="true"
           >
-            <div ref={visualRef} className={styles.visual}>
-              <canvas ref={canvasRef} className={styles.canvas} />
+            <div
+              ref={visualRef}
+              data-why-wheel
+              className={styles.wheel}
+            >
+              <canvas
+                ref={canvasRef}
+                data-why-canvas
+                className={styles.canvas}
+                aria-hidden="true"
+              />
+              <ul
+                className={styles.offers}
+                aria-label="Six offers"
+                data-why-offers
+              >
+                {wheelOffers.map((offer) => (
+                  <li
+                    key={offer.number}
+                    data-why-offer
+                    className={styles.offer}
+                    style={{ left: `${offer.left}%`, top: `${offer.top}%` }}
+                  >
+                    <span className={styles.offerNumber}>
+                      {offer.number}
+                    </span>
+                    <span className={styles.offerName}>{offer.title}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <figcaption className={styles.caption}>
-              <span>Six perspectives</span>
+              <span>Six offers</span>
               <span className={styles.captionRule} />
-              <span>One direction</span>
+              <span>One team</span>
             </figcaption>
           </figure>
         </div>
