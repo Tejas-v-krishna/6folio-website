@@ -484,7 +484,7 @@ export default function HomeHero() {
       baseContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const cell = Math.max(3, Math.round(width / 220));
+      const cell = Math.max(3, Math.round(width / 300));
       const cols = Math.ceil(width / cell);
       const rows = Math.ceil(height / cell);
 
