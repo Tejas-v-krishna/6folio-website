@@ -10,7 +10,10 @@ const INK = "#2834b8";
 const FRAME_MS = 1000 / 20;
 const GRAVITY = Math.pow((2 * Math.PI) / 3.8, 2);
 const SWING = 0.17;
-const MAX_SPEED = Math.sqrt(2 * GRAVITY * (1 - Math.cos(SWING)));
+const REST_OFFSET = 0.05;
+const MAX_SPEED = Math.sqrt(
+  2 * GRAVITY * (1 - Math.cos(SWING / 2)),
+);
 const MAX_IRIS_CELLS = 2;
 
 const PIVOT = { x: 0.65, y: 0.175 };
@@ -300,7 +303,8 @@ export default function HomeHero() {
         }
       }
 
-      const chainAngle = baseChainAngle + currentPendulum;
+      const chainAngle =
+        baseChainAngle + REST_OFFSET + currentPendulum;
       const lensCenterX = pivotX + Math.sin(chainAngle) * lensOrbit;
       const lensCenterY = pivotY + Math.cos(chainAngle) * lensOrbit;
       const lensHoleRadius = lensRing * 1.04;
@@ -368,27 +372,29 @@ export default function HomeHero() {
 
       for (let index = 0; index < steps; index += 1) {
         const previousAngle = pendulumAngle;
-        const acceleration = -GRAVITY * Math.sin(pendulumAngle);
+        const acceleration = -GRAVITY *
+          Math.sin(pendulumAngle - SWING / 2);
 
         pendulumVelocity += acceleration * step;
         pendulumAngle += pendulumVelocity * step;
 
+        const previousOffset = previousAngle - SWING / 2;
+        const currentOffset = pendulumAngle - SWING / 2;
+
         if (
-          previousAngle !== 0 &&
-          Math.sign(previousAngle) !== Math.sign(pendulumAngle)
+          previousOffset !== 0 &&
+          Math.sign(previousOffset) !== Math.sign(currentOffset)
         ) {
           pendulumVelocity =
-            Math.sign(pendulumVelocity || pendulumAngle || 1) * MAX_SPEED;
+            Math.sign(pendulumVelocity || currentOffset || 1) * MAX_SPEED;
         }
       }
 
-      const swingLimit = SWING * 1.005;
-
-      if (pendulumAngle > swingLimit) {
-        pendulumAngle = swingLimit;
+      if (pendulumAngle > SWING) {
+        pendulumAngle = SWING;
         pendulumVelocity = Math.min(0, pendulumVelocity);
-      } else if (pendulumAngle < -swingLimit) {
-        pendulumAngle = -swingLimit;
+      } else if (pendulumAngle < 0) {
+        pendulumAngle = 0;
         pendulumVelocity = Math.max(0, pendulumVelocity);
       }
 
@@ -591,7 +597,7 @@ export default function HomeHero() {
       }
 
       if (!pendulumReady || reduced) {
-        pendulumAngle = reduced ? 0 : SWING;
+        pendulumAngle = 0;
         pendulumVelocity = 0;
         pendulumReady = true;
       }
@@ -633,7 +639,7 @@ export default function HomeHero() {
       }
 
       revealed = true;
-      pendulumAngle = reduced ? 0 : SWING;
+      pendulumAngle = 0;
       pendulumVelocity = 0;
       draw();
       start();
