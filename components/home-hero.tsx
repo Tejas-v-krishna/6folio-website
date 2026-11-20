@@ -174,74 +174,40 @@ export default function HomeHero() {
     ) => {
       const directionX = Math.sin(chainAngle);
       const directionY = Math.cos(chainAngle);
-      const chainEndX = lensCenterX - directionX * lensRing;
-      const chainEndY = lensCenterY - directionY * lensRing;
-      const chordX = chainEndX - pivotX;
-      const chordY = chainEndY - pivotY;
-      const chordLength = Math.hypot(chordX, chordY);
+      const chainEndX = lensCenterX - directionX * lensRing * 0.96;
+      const chainEndY = lensCenterY - directionY * lensRing * 0.96;
+      const chainX = chainEndX - pivotX;
+      const chainY = chainEndY - pivotY;
+      const chainLength = Math.hypot(chainX, chainY);
 
-      if (chordLength < 1) return;
+      if (chainLength < 1) return;
 
-      const normalX = -chordY / chordLength;
-      const normalY = chordX / chordLength;
-      const angularVelocity = reduced
-        ? 0
-        : SWING *
-          Math.cos(wave - 0.22) *
-          ((Math.PI * 2) / LOOP_SECONDS);
-      const bow = Math.max(
-        -10,
-        Math.min(10, -angularVelocity * lensOrbit * 0.32),
-      );
-      const controlX = (pivotX + chainEndX) / 2 + normalX * bow;
-      const controlY = (pivotY + chainEndY) / 2 + normalY * bow;
+      const step = Math.max(gridCell * 1.15, 3);
+      const steps = Math.max(1, Math.round(chainLength / step));
+      const perpendicularX = -chainY / chainLength;
+      const perpendicularY = chainX / chainLength;
 
-      const chainPoint = (t: number) => {
-        const inverse = 1 - t;
-        return {
-          x:
-            inverse * inverse * pivotX +
-            2 * inverse * t * controlX +
-            t * t * chainEndX,
-          y:
-            inverse * inverse * pivotY +
-            2 * inverse * t * controlY +
-            t * t * chainEndY,
-        };
-      };
+      for (let index = 0; index <= steps; index += 1) {
+        const t = index / steps;
+        const x = pivotX + chainX * t;
+        const y = pivotY + chainY * t;
+        const gx = Math.floor(x / gridCell);
+        const gy = Math.floor(y / gridCell);
+        const isLink = index % 4 === 0;
 
-      const linkSpacing = Math.max(gridCell * 3.5, lensRing * 0.16);
-      const linkCount = Math.max(1, Math.round(chordLength / linkSpacing));
-      const linkRadiusX = linkSpacing * 0.52;
-      const linkRadiusY = Math.max(gridCell * 0.9, lensRing * 0.04);
+        setDensity(gx, gy, isLink ? 0.95 : 0.7);
 
-      for (let index = 0; index <= linkCount; index += 1) {
-        const t = index / linkCount;
-        const point = chainPoint(t);
-        const behind = chainPoint(Math.max(0, t - 0.01));
-        const ahead = chainPoint(Math.min(1, t + 0.01));
-        let tangentX = ahead.x - behind.x;
-        let tangentY = ahead.y - behind.y;
-        const tangentLength = Math.hypot(tangentX, tangentY) || 1;
+        if (isLink) {
+          for (const offset of [-1, 1]) {
+            const shoulderX = x + perpendicularX * offset * gridCell;
+            const shoulderY = y + perpendicularY * offset * gridCell;
 
-        tangentX /= tangentLength;
-        tangentY /= tangentLength;
-
-        const linkNormalX = -tangentY;
-        const linkNormalY = tangentX;
-
-        for (let pointIndex = 0; pointIndex < 12; pointIndex += 1) {
-          const angle = (pointIndex / 12) * Math.PI * 2;
-          const along = Math.cos(angle) * linkRadiusX;
-          const across = Math.sin(angle) * linkRadiusY;
-          const x = point.x + tangentX * along + linkNormalX * across;
-          const y = point.y + tangentY * along + linkNormalY * across;
-          const gx = Math.floor(x / gridCell);
-          const gy = Math.floor(y / gridCell);
-          const density =
-            0.68 + 0.18 * Math.abs(Math.sin(index * 1.7 + pointIndex));
-
-          setDensity(gx, gy, density);
+            setDensity(
+              Math.floor(shoulderX / gridCell),
+              Math.floor(shoulderY / gridCell),
+              0.55,
+            );
+          }
         }
       }
 
