@@ -33,7 +33,13 @@ type Dot = {
   y: number;
   size: number;
   maxSize: number;
-  phase: number;
+};
+
+type EyeCell = {
+  x: number;
+  y: number;
+  gridX: number;
+  gridY: number;
   eyeWeight: number;
 };
 
@@ -98,7 +104,8 @@ export default function HomeHero() {
     let width = 0;
     let height = 0;
     let baseDots: Dot[] = [];
-    let eyeDots: Dot[] = [];
+    let eyeCells: EyeCell[] = [];
+    let gridData: Uint8ClampedArray | null = null;
     let phase = 0;
     let pivotX = 0;
     let pivotY = 0;
@@ -125,6 +132,38 @@ export default function HomeHero() {
       if (value <= current) return;
       if (current === 0) touchedCells.push(index);
       densityMap[index] = value;
+    };
+
+    const sampleDensity = (x: number, y: number) => {
+      if (!gridData) return 0;
+
+      const x0 = Math.max(0, Math.min(gridCols - 1, Math.floor(x)));
+      const y0 = Math.max(0, Math.min(gridRows - 1, Math.floor(y)));
+      const x1 = Math.min(gridCols - 1, x0 + 1);
+      const y1 = Math.min(gridRows - 1, y0 + 1);
+      const tx = Math.max(0, Math.min(1, x - x0));
+      const ty = Math.max(0, Math.min(1, y - y0));
+
+      const luminanceAt = (ix: number, iy: number) => {
+        const offset = (iy * gridCols + ix) * 4;
+        const r = gridData?.[offset] ?? 0;
+        const g = gridData?.[offset + 1] ?? 0;
+        const b = gridData?.[offset + 2] ?? 0;
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+
+      const densityAt = (ix: number, iy: number) =>
+        Math.max(
+          0,
+          Math.min(1, (244 - luminanceAt(ix, iy)) / 196),
+        );
+
+      const top =
+        densityAt(x0, y0) * (1 - tx) + densityAt(x1, y0) * tx;
+      const bottom =
+        densityAt(x0, y1) * (1 - tx) + densityAt(x1, y1) * tx;
+
+      return top * (1 - ty) + bottom * ty;
     };
 
     const buildPendantDensity = (
@@ -329,15 +368,29 @@ export default function HomeHero() {
       const eyeShiftY = eyeShiftX * 0.14;
       const lensHoleRadius = lensRing * 1.04;
 
-      for (const dot of eyeDots) {
-        const x = dot.x + eyeShiftX * dot.eyeWeight;
-        const y = dot.y + eyeShiftY * dot.eyeWeight;
-        const pulse = 0.9 + 0.1 * Math.sin(wave - dot.phase);
-        const size = Math.min(dot.size * pulse, dot.maxSize);
+      const eyeShiftGridX = eyeShiftX / gridCell;
+      const eyeShiftGridY = eyeShiftY / gridCell;
+
+      for (const cell of eyeCells) {
+        const sampleX = cell.gridX + eyeShiftGridX * cell.eyeWeight;
+        const sampleY = cell.gridY + eyeShiftGridY * cell.eyeWeight;
+        const density = sampleDensity(sampleX, sampleY);
+
+        if (density < 0.07) continue;
+
+        const size = Math.min(
+          Math.pow(density, 0.6) * gridCell * 0.96 * 0.94,
+          gridCell,
+        );
 
         if (size < 0.45) continue;
 
-        context.fillRect(x - size / 2, y - size / 2, size, size);
+        context.fillRect(
+          cell.x - size / 2,
+          cell.y - size / 2,
+          size,
+          size,
+        );
       }
 
       context.fillStyle = PAPER;
@@ -510,7 +563,8 @@ export default function HomeHero() {
       }));
 
       baseDots = [];
-      eyeDots = [];
+      eyeCells = [];
+      gridData = data;
 
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
@@ -520,9 +574,6 @@ export default function HomeHero() {
           const b = data[index + 2];
           const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
           const density = Math.max(0, Math.min(1, (244 - luminance) / 196));
-
-          if (density < 0.07) continue;
-
           const sourceDotX = sourceX + ((x + 0.5) / cols) * sourceWidth;
           const sourceDotY = sourceY + ((y + 0.5) / rows) * sourceHeight;
 
@@ -571,24 +622,26 @@ export default function HomeHero() {
 
           const dotX = (x + 0.5) * cell;
           const dotY = (y + 0.5) * cell;
-          const lensDistance = Math.hypot(
-            dotX - baseLensX,
-            dotY - baseLensY,
-          );
-          const dot: Dot = {
+
+          if (eyeWeight > 0.02) {
+            eyeCells.push({
+              x: dotX,
+              y: dotY,
+              gridX: x,
+              gridY: y,
+              eyeWeight,
+            });
+            continue;
+          }
+
+          if (density < 0.07) continue;
+
+          baseDots.push({
             x: dotX,
             y: dotY,
             size: Math.pow(density, 0.6) * cell * 0.96,
             maxSize: cell,
-            phase: lensDistance * 0.03,
-            eyeWeight,
-          };
-
-          if (eyeWeight > 0.02) {
-            eyeDots.push(dot);
-          } else {
-            baseDots.push(dot);
-          }
+          });
         }
       }
 
