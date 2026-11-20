@@ -23,10 +23,6 @@ const LENS_RING_RADIUS = 0.075;
 const LENS_MASK = { x: 0.797, y: 0.49, rx: 0.094, ry: 0.11 };
 const CHAIN_MASK_RADIUS = 0.025;
 const SWING = 0.075;
-const EYES = [
-  { x: 0.419, y: 0.44, rx: 0.018, ry: 0.0145 },
-  { x: 0.586, y: 0.435, rx: 0.018, ry: 0.0145 },
-];
 
 type Dot = {
   x: number;
@@ -97,7 +93,6 @@ export default function HomeHero() {
     let width = 0;
     let height = 0;
     let baseDots: Dot[] = [];
-    let irisDots: Dot[] = [];
     let phase = 0;
     let pivotX = 0;
     let pivotY = 0;
@@ -285,19 +280,6 @@ export default function HomeHero() {
       const lensCenterX = pivotX + Math.sin(chainAngle) * lensOrbit;
       const lensCenterY = pivotY + Math.cos(chainAngle) * lensOrbit;
       const lensHoleRadius = lensRing * 1.04;
-      const swingRatio = reduced
-        ? 0
-        : (Math.sin(chainAngle) - Math.sin(baseChainAngle)) / SWING;
-      const irisShiftX = Math.round(swingRatio * 2.4) * gridCell;
-
-      for (const dot of irisDots) {
-        const x = dot.x + irisShiftX;
-        const size = Math.min(dot.size * 0.94, dot.maxSize);
-
-        if (size < 0.45) continue;
-
-        context.fillRect(x - size / 2, dot.y - size / 2, size, size);
-      }
 
       context.fillStyle = PAPER;
       context.beginPath();
@@ -461,15 +443,7 @@ export default function HomeHero() {
         x: point.x * naturalWidth,
         y: point.y * naturalHeight,
       }));
-      const eyeData = EYES.map((eye) => ({
-        x: eye.x * naturalWidth,
-        y: eye.y * naturalHeight,
-        rx: eye.rx * naturalWidth,
-        ry: eye.ry * naturalHeight,
-      }));
-
       baseDots = [];
-      irisDots = [];
 
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
@@ -512,41 +486,12 @@ export default function HomeHero() {
             continue;
           }
 
-          let inIris = false;
-
-          for (const eye of eyeData) {
-            const eyeX = (sourceDotX - eye.x) / eye.rx;
-            const eyeY = (sourceDotY - eye.y) / eye.ry;
-            const eyeDistance = eyeX * eyeX + eyeY * eyeY;
-
-            if (eyeDistance < 1) {
-              inIris = true;
-              break;
-            }
-          }
-
-          const dotX = (x + 0.5) * cell;
-          const dotY = (y + 0.5) * cell;
-          const dotSize = Math.pow(density, 0.6) * cell * 0.96;
-
-          if (inIris) {
-            if (density >= 0.07) {
-              irisDots.push({
-                x: dotX,
-                y: dotY,
-                size: dotSize,
-                maxSize: cell,
-              });
-            }
-            continue;
-          }
-
           if (density < 0.07) continue;
 
           baseDots.push({
-            x: dotX,
-            y: dotY,
-            size: dotSize,
+            x: (x + 0.5) * cell,
+            y: (y + 0.5) * cell,
+            size: Math.pow(density, 0.6) * cell * 0.96,
             maxSize: cell,
           });
         }
