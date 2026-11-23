@@ -341,6 +341,7 @@ export default function WhySection() {
     let particles: Particle[] = [];
     let activeService = -1;
     let frame = 0;
+    let fieldActive = false;
     let disposed = false;
 
     const updateHud = (index: number) => {
@@ -501,6 +502,8 @@ export default function WhySection() {
     };
 
     const resize = () => {
+      if (!fieldActive) return;
+
       const rect = visual.getBoundingClientRect();
 
       if (rect.width === 0 || rect.height === 0) return;
@@ -562,6 +565,18 @@ export default function WhySection() {
     resizeObserver.observe(visual);
     resize();
 
+    const fieldObserver = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+
+        fieldActive = true;
+        fieldObserver.disconnect();
+        resize();
+      },
+      { rootMargin: "0px 0px -25% 0px" },
+    );
+    fieldObserver.observe(section);
+
     const onModeChange = () => {
       setupMode();
       requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -577,6 +592,7 @@ export default function WhySection() {
       disposed = true;
       trigger?.kill();
       resizeObserver.disconnect();
+      fieldObserver.disconnect();
       cancelAnimationFrame(frame);
       motionQuery.removeEventListener("change", onModeChange);
       desktopQuery.removeEventListener("change", onModeChange);
