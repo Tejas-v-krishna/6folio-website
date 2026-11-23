@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { services } from "@/content/services";
@@ -10,7 +10,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 const INK = "#2834b8";
 const HEADER_OFFSET = 61;
-const FORMED_AT = 0.64;
+const INTRO_HIDE_AT = 0.2;
+const FORMED_AT = 0.36;
+const SERVICE_START = 0.38;
+const MORPH_START = 0.12;
+const MORPH_END = 0.32;
+const STATIC_PROGRESS = 0.34;
+const SERVICE_SPAN = services.length - 1;
 
 const principles = [
   {
@@ -35,18 +41,17 @@ const WHEEL_BLADE_OUTER = 0.92;
 const WHEEL_CURVE_START = 0.14;
 const WHEEL_CURVE_END = 0.72;
 const WHEEL_LABEL_RADIUS = 0.6;
-const WHEEL_BASE_ANGLE = -Math.PI / 2 + 0.08;
 const WHEEL_LABEL_T =
   (WHEEL_LABEL_RADIUS - WHEEL_BLADE_INNER) /
   (WHEEL_BLADE_OUTER - WHEEL_BLADE_INNER);
 const WHEEL_LABEL_OFFSET =
   WHEEL_CURVE_START +
   (WHEEL_CURVE_END - WHEEL_CURVE_START) * WHEEL_LABEL_T;
+const WHEEL_BASE_ANGLE = -Math.PI / 2 - WHEEL_LABEL_OFFSET;
 const LABEL_PERCENT = WHEEL_OUTER * WHEEL_LABEL_RADIUS * 100;
 
 const wheelOffers = services.map((service, index) => {
-  const angle =
-    WHEEL_BASE_ANGLE + (index * Math.PI) / 3 + WHEEL_LABEL_OFFSET;
+  const angle = -Math.PI / 2 + (index * Math.PI) / 3;
 
   return {
     ...service,
@@ -75,6 +80,13 @@ type Particle = {
   targetAlpha: number;
 };
 
+type Stage = {
+  formed: boolean;
+  introHidden: boolean;
+  rotation: number;
+  active: number;
+};
+
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
 }
@@ -99,8 +111,23 @@ function seeded(index: number, salt: number) {
   return value - Math.floor(value);
 }
 
-function activeIndex(progress: number) {
-  return progress < 0.34 ? 0 : progress < 0.67 ? 1 : 2;
+function getStage(value: number): Stage {
+  const formed = value >= FORMED_AT;
+  const serviceFloat =
+    clamp((value - SERVICE_START) / (1 - SERVICE_START)) *
+    SERVICE_SPAN;
+  const rotation =
+    value >= SERVICE_START ? -serviceFloat * (Math.PI / 3) : 0;
+  const active = formed
+    ? Math.min(services.length - 1, Math.round(serviceFloat))
+    : -1;
+
+  return {
+    formed,
+    introHidden: value >= INTRO_HIDE_AT,
+    rotation,
+    active,
+  };
 }
 
 function buildEmblem(width: number, height: number): EmblemDot[] {
@@ -285,8 +312,12 @@ export default function WhySection() {
   const figureRef = useRef<HTMLElement | null>(null);
   const visualRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const progressBarRef = useRef<HTMLDivElement | null>(null);
-  const [active, setActive] = useState(0);
+  const offersRef = useRef<HTMLUListElement | null>(null);
+  const hudRef = useRef<HTMLDivElement | null>(null);
+  const hudNumberRef = useRef<HTMLSpanElement | null>(null);
+  const hudTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const hudBodyRef = useRef<HTMLParagraphElement | null>(null);
+  const hudIndexRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -304,35 +335,128 @@ export default function WhySection() {
     let width = 0;
     let height = 0;
     let progress = 0;
+    let interactive = false;
     let trigger: ScrollTrigger | null = null;
     let emblemCanvas: HTMLCanvasElement | null = null;
     let particles: Particle[] = [];
+    let activeService = -1;
     let frame = 0;
     let disposed = false;
-    let formed = false;
 
-    const setFormed = (value: number) => {
-      const next = value >= FORMED_AT;
+    const updateHud = (index: number) => {
+      if (index === activeService) return;
 
-      if (next === formed) return;
-      formed = next;
-      figure.dataset.formed = String(next);
+      activeService = index;
+
+      const offers = offersRef.current?.children;
+
+      if (offers) {
+        for (let offerIndex = 0; offerIndex < offers.length; offerIndex += 1) {
+          offers[offerIndex].classList.toggle(
+            styles.active,
+            offerIndex === index,
+          );
+        }
+      }
+
+      if (index < 0) return;
+
+      const service = services[index];
+
+      if (!service) return;
+
+      if (hudNumberRef.current) {
+        hudNumberRef.current.textContent = service.number;
+      }
+      if (hudTitleRef.current) {
+        hudTitleRef.current.textContent = service.title;
+      }
+      if (hudBodyRef.current) {
+        hudBodyRef.current.textContent = service.strapline;
+      }
+      if (hudIndexRef.current) {
+        hudIndexRef.current.textContent = `${String(index + 1).padStart(
+          2,
+          "0",
+        )} / ${String(services.length).padStart(2, "0")}`;
+      }
+    };
+
+    const positionOffers = (rotation: number) => {
+      const offers = offersRef.current;
+
+      if (!offers || width === 0 || height === 0) return;
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius =
+        Math.min(width, height) * WHEEL_OUTER * WHEEL_LABEL_RADIUS;
+
+      for (let index = 0; index < offers.children.length; index += 1) {
+        const offer = offers.children[index] as HTMLElement;
+        const angle =
+          -Math.PI / 2 +
+          (index * Math.PI) / 3 +
+          rotation;
+
+        offer.style.left = `${centerX + Math.cos(angle) * radius}px`;
+        offer.style.top = `${centerY + Math.sin(angle) * radius}px`;
+      }
+    };
+
+    const updateInteractiveStage = (value: number) => {
+      const stage = getStage(value);
+
+      section.dataset.intro = stage.introHidden ? "hidden" : "visible";
+      figure.dataset.formed = String(stage.formed);
+
+      if (hudRef.current) {
+        hudRef.current.dataset.visible = String(stage.formed);
+      }
+
+      positionOffers(stage.rotation);
+      updateHud(stage.active);
+    };
+
+    const updateStaticStage = () => {
+      section.dataset.intro = "visible";
+      figure.dataset.formed = "true";
+
+      if (hudRef.current) {
+        hudRef.current.dataset.visible = "false";
+      }
+
+      positionOffers(0);
+      updateHud(-1);
     };
 
     const draw = (value: number) => {
       if (width === 0 || height === 0) return;
 
+      const stage = getStage(value);
+      const emblemAlpha = smoothstep(
+        (value - MORPH_START) / (MORPH_END - MORPH_START),
+      );
+
       context.clearRect(0, 0, width, height);
 
-      const emblemAlpha = smoothstep((value - 0.28) / 0.52);
-
       if (emblemCanvas && emblemAlpha > 0) {
+        context.save();
+        context.translate(width / 2, height / 2);
+        context.rotate(stage.rotation);
         context.globalAlpha = emblemAlpha;
-        context.drawImage(emblemCanvas, 0, 0, width, height);
+        context.drawImage(
+          emblemCanvas,
+          -width / 2,
+          -height / 2,
+          width,
+          height,
+        );
+        context.restore();
       }
 
-      const formation = easeInOutCubic(clamp(value / 0.82));
-      const particleAlpha = 1 - smoothstep((value - 0.84) / 0.14);
+      const formation = easeInOutCubic(clamp(value / MORPH_END));
+      const particleAlpha = 1 - smoothstep((value - 0.26) / 0.08);
       const centerX = width / 2;
       const centerY = height / 2;
 
@@ -381,7 +505,7 @@ export default function WhySection() {
 
       if (rect.width === 0 || rect.height === 0) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       width = rect.width;
       height = rect.height;
       canvas.width = Math.max(1, Math.round(width * dpr));
@@ -393,6 +517,13 @@ export default function WhySection() {
       const dots = buildEmblem(width, height);
       emblemCanvas = renderEmblem(dots, width, height, dpr);
       particles = buildParticles(dots, width, height);
+
+      if (interactive) {
+        updateInteractiveStage(progress);
+      } else {
+        updateStaticStage();
+      }
+
       draw(progress);
     };
 
@@ -402,16 +533,12 @@ export default function WhySection() {
       trigger?.kill();
       trigger = null;
 
-      const interactive = desktopQuery.matches && !motionQuery.matches;
+      interactive = desktopQuery.matches && !motionQuery.matches;
 
       if (!interactive) {
-        if (progressBarRef.current) {
-          progressBarRef.current.style.transform = "scaleY(0)";
-        }
-        setActive(-1);
-        setFormed(1);
-        progress = 1;
-        draw(1);
+        progress = STATIC_PROGRESS;
+        updateStaticStage();
+        draw(progress);
         return;
       }
 
@@ -421,28 +548,13 @@ export default function WhySection() {
         end: "bottom bottom",
         onUpdate: (self) => {
           progress = self.progress;
-          const nextActive = activeIndex(progress);
-
-          setActive((current) =>
-            current === nextActive ? current : nextActive,
-          );
-          setFormed(progress);
-
-          if (progressBarRef.current) {
-            progressBarRef.current.style.transform = `scaleY(${progress})`;
-          }
-
+          updateInteractiveStage(progress);
           requestDraw();
         },
       });
 
       progress = trigger.progress;
-      setActive(activeIndex(progress));
-      setFormed(progress);
-
-      if (progressBarRef.current) {
-        progressBarRef.current.style.transform = `scaleY(${progress})`;
-      }
+      updateInteractiveStage(progress);
       draw(progress);
     };
 
@@ -475,24 +587,25 @@ export default function WhySection() {
     <section
       ref={sectionRef}
       data-why-section
+      data-intro="visible"
       className={styles.section}
       aria-labelledby="why-title"
     >
       <noscript>
         <style>{`
           [data-why-section] { min-height: auto !important; }
-          [data-why-sticky] { position: static !important; height: auto !important; min-height: auto !important; }
-          [data-why-grid] { grid-template-columns: 1fr !important; }
-          [data-why-visual] { max-width: none !important; justify-self: stretch !important; }
-          [data-why-wheel] { aspect-ratio: auto !important; border: 0 !important; overflow: visible !important; container-type: normal !important; }
+          [data-why-sticky] { position: static !important; display: block !important; width: min(calc(100% - 2rem), 1240px) !important; height: auto !important; margin-inline: auto !important; padding-block: 3rem !important; }
+          [data-why-intro] { position: static !important; width: auto !important; max-width: none !important; transform: none !important; opacity: 1 !important; }
+          [data-why-scrim] { display: none !important; }
+          [data-why-visual] { position: static !important; display: block !important; width: 100% !important; height: auto !important; max-width: none !important; margin-top: 2rem !important; }
+          [data-why-wheel] { aspect-ratio: auto !important; width: 100% !important; height: auto !important; border: 0 !important; overflow: visible !important; container-type: normal !important; }
           [data-why-canvas] { display: none !important; }
           [data-why-offers] { position: static !important; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 0.8rem 1.5rem !important; }
-          [data-why-offer] { position: static !important; width: auto !important; padding: 0.55rem 0 !important; transform: none !important; opacity: 1 !important; border-top: 1px solid rgba(10, 10, 15, 0.14) !important; background: transparent !important; transition: none !important; }
-          [data-why-offer] > span:first-child { font-size: 0.58rem !important; }
-          [data-why-offer] > span:last-child { font-size: 0.78rem !important; line-height: 1.3 !important; }
-          [data-why-rail] { display: none !important; }
-          [data-why-title] { opacity: 1 !important; }
-          [data-why-body] { grid-template-rows: 1fr !important; }
+          [data-why-offer] { position: static !important; width: auto !important; padding: 0.55rem 0 !important; transform: none !important; opacity: 1 !important; border-top: 1px solid rgba(10, 10, 15, 0.14) !important; background: transparent !important; box-shadow: none !important; transition: none !important; }
+          [data-why-offer] > span:first-child { font-size: 0.58rem !important; opacity: 1 !important; }
+          [data-why-offer] > span:last-child { font-size: 0.78rem !important; line-height: 1.3 !important; opacity: 1 !important; }
+          [data-why-caption] { position: static !important; width: auto !important; margin-top: 1rem !important; opacity: 1 !important; transform: none !important; }
+          [data-why-hud] { display: none !important; }
           @media (min-width: 900px) {
             [data-why-offers] { grid-template-columns: repeat(3, 1fr) !important; }
           }
@@ -500,102 +613,111 @@ export default function WhySection() {
       </noscript>
 
       <div data-why-sticky className={styles.sticky}>
-        <div data-why-grid className={styles.grid}>
-          <div className={styles.content}>
-            <div className={styles.eyebrowRow}>
-              <span className="badge-icon" aria-hidden="true">
-                6
-              </span>
-              <p className="eyebrow">Why 6FOLIO</p>
-            </div>
+        <div data-why-scrim className={styles.introScrim} aria-hidden="true" />
 
-            <h2 id="why-title" className={styles.heading}>
-              A clearer way to build the whole picture.
-            </h2>
-
-            <p className={`body-copy ${styles.intro}`}>
-              A brand is not built in separate pieces. The words affect the
-              visuals. The visuals shape the campaign. The campaign leads people
-              to an experience. The experience decides whether they stay,
-              enquire, or leave.
-            </p>
-
-            <div className={styles.listWrap}>
-              <div data-why-rail className={styles.rail} aria-hidden="true">
-                <span ref={progressBarRef} className={styles.progress} />
-              </div>
-
-              <ol className={styles.list}>
-                {principles.map((principle, index) => (
-                  <li
-                    key={principle.title}
-                    data-why-item
-                    className={`${styles.item} ${
-                      active === index ? styles.active : ""
-                    }`}
-                  >
-                    <div className={styles.itemHead}>
-                      <span className={styles.number} aria-hidden="true">
-                        0{index + 1}
-                      </span>
-                      <h3 data-why-title className={styles.title}>
-                        {principle.title}
-                      </h3>
-                    </div>
-                    <div data-why-body className={styles.bodyWrap}>
-                      <div className={styles.bodyInner}>
-                        <p className={styles.body}>{principle.body}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+        <div data-why-intro className={styles.intro}>
+          <div className={styles.eyebrowRow}>
+            <span className="badge-icon" aria-hidden="true">
+              6
+            </span>
+            <p className="eyebrow">Why 6FOLIO</p>
           </div>
 
-          <figure
-            ref={figureRef}
-            data-why-visual
-            data-formed="false"
-            className={styles.figure}
-          >
-            <div
-              ref={visualRef}
-              data-why-wheel
-              className={styles.wheel}
+          <h2 id="why-title" className={styles.heading}>
+            A clearer way to build the whole picture.
+          </h2>
+
+          <p className={`body-copy ${styles.introCopy}`}>
+            A brand is not built in separate pieces. The words affect the
+            visuals. The visuals shape the campaign. The campaign leads people
+            to an experience. The experience decides whether they stay,
+            enquire, or leave.
+          </p>
+
+          <ol className={styles.principles}>
+            {principles.map((principle, index) => (
+              <li key={principle.title} className={styles.principle}>
+                <div className={styles.principleHead}>
+                  <span className={styles.number} aria-hidden="true">
+                    0{index + 1}
+                  </span>
+                  <h3 className={styles.principleTitle}>
+                    {principle.title}
+                  </h3>
+                </div>
+                <p className={styles.principleBody}>{principle.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <figure
+          ref={figureRef}
+          data-why-visual
+          data-formed="false"
+          className={styles.figure}
+        >
+          <div ref={visualRef} data-why-wheel className={styles.wheel}>
+            <canvas
+              ref={canvasRef}
+              data-why-canvas
+              className={styles.canvas}
+              aria-hidden="true"
+            />
+            <ul
+              ref={offersRef}
+              className={styles.offers}
+              aria-label="Six offers"
+              data-why-offers
             >
-              <canvas
-                ref={canvasRef}
-                data-why-canvas
-                className={styles.canvas}
-                aria-hidden="true"
-              />
-              <ul
-                className={styles.offers}
-                aria-label="Six offers"
-                data-why-offers
-              >
-                {wheelOffers.map((offer) => (
-                  <li
-                    key={offer.number}
-                    data-why-offer
-                    className={styles.offer}
-                    style={{ left: `${offer.left}%`, top: `${offer.top}%` }}
-                  >
-                    <span className={styles.offerNumber}>
-                      {offer.number}
-                    </span>
-                    <span className={styles.offerName}>{offer.title}</span>
-                  </li>
-                ))}
-              </ul>
+              {wheelOffers.map((offer) => (
+                <li
+                  key={offer.number}
+                  data-why-offer
+                  className={styles.offer}
+                  style={{ left: `${offer.left}%`, top: `${offer.top}%` }}
+                >
+                  <span className={styles.offerNumber}>{offer.number}</span>
+                  <span className={styles.offerName}>{offer.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <figcaption data-why-caption className={styles.caption}>
+            <span>Six offers</span>
+            <span className={styles.captionRule} />
+            <span>One team</span>
+          </figcaption>
+        </figure>
+
+        <div
+          ref={hudRef}
+          data-why-hud
+          data-visible="false"
+          className={styles.hud}
+          aria-hidden="true"
+        >
+          <div className={styles.hudTop}>
+            <span className="eyebrow">Six offers</span>
+            <span ref={hudIndexRef} className={styles.hudIndex}>
+              01 / 06
+            </span>
+          </div>
+
+          <div className={styles.hudMain}>
+            <span ref={hudNumberRef} className={styles.hudNumber}>
+              01
+            </span>
+            <div>
+              <h3 ref={hudTitleRef} className={styles.hudTitle}>
+                Brand direction
+              </h3>
+              <p ref={hudBodyRef} className={styles.hudBody}>
+                Give the business a point of view.
+              </p>
             </div>
-            <figcaption className={styles.caption}>
-              <span>Six offers</span>
-              <span className={styles.captionRule} />
-              <span>One team</span>
-            </figcaption>
-          </figure>
+          </div>
         </div>
       </div>
     </section>
